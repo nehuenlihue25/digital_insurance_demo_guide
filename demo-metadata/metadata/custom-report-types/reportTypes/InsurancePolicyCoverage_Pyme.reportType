@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ReportType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <baseObject>InsurancePolicyCoverage</baseObject>
+    <category>other</category>
+    <deployed>true</deployed>
+    <description>CRT ALFA Pyme para InsurancePolicyCoverage</description>
+    <label>Coberturas Pyme</label>
+    <sections>
+        <columns>
+            <checkedByDefault>true</checkedByDefault>
+            <field>Id</field>
+            <table>InsurancePolicyCoverage</table>
+        </columns>
+        <columns>
+            <checkedByDefault>true</checkedByDefault>
+            <field>Name</field>
+            <table>InsurancePolicyCoverage</table>
+        </columns>
+        <masterLabel>Coberturas Pyme</masterLabel>
+    </sections>
+</ReportType>

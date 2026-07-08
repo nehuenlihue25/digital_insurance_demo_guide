@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>InsurancePolicy_Pyme</members>
+        <members>Claim_Pyme</members>
+        <members>ClaimCoveragePaymentDetail_Pyme</members>
+        <members>ClaimCovReserveAdjustment_Pyme</members>
+        <members>InsurancePolicyCoverage_Pyme</members>
+        <name>ReportType</name>
+    </types>
+    <version>62.0</version>
+</Package>

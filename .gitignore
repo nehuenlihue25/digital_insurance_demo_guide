@@ -1,0 +1,17 @@
+# macOS
+.DS_Store
+._*
+
+# Claude Code session state (privado)
+.claude/
+launch.json
+scheduled_tasks.json
+
+# Salesforce CLI state
+.sfdx/
+.sf/
+
+# Temp files
+*.tmp
+*.swp
+*~

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ReportType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <baseObject>Claim</baseObject>
+    <category>other</category>
+    <deployed>true</deployed>
+    <description>CRT ALFA Pyme para Claim</description>
+    <label>Siniestros Pyme</label>
+    <sections>
+        <columns>
+            <checkedByDefault>true</checkedByDefault>
+            <field>Id</field>
+            <table>Claim</table>
+        </columns>
+        <columns>
+            <checkedByDefault>true</checkedByDefault>
+            <field>Name</field>
+            <table>Claim</table>
+        </columns>
+        <masterLabel>Siniestros Pyme</masterLabel>
+    </sections>
+</ReportType>

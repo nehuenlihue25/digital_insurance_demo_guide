@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ReportType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <baseObject>ClaimCoveragePaymentDetail</baseObject>
+    <category>other</category>
+    <deployed>true</deployed>
+    <description>CRT ALFA Pyme para ClaimCoveragePaymentDetail</description>
+    <label>Pagos Siniestros Pyme</label>
+    <sections>
+        <columns>
+            <checkedByDefault>true</checkedByDefault>
+            <field>Id</field>
+            <table>ClaimCoveragePaymentDetail</table>
+        </columns>
+        <columns>
+            <checkedByDefault>true</checkedByDefault>
+            <field>Name</field>
+            <table>ClaimCoveragePaymentDetail</table>
+        </columns>
+        <masterLabel>Pagos Siniestros Pyme</masterLabel>
+    </sections>
+</ReportType>

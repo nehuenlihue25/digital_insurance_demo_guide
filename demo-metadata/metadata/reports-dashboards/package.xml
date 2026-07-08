@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>Seguros_ALFA_Pyme/Reserva_Total_Pyme</members>
+        <members>Seguros_ALFA_Pyme/Pagos_Aprobados_vs_Pendientes_Pyme</members>
+        <members>Seguros_ALFA_Pyme/Siniestros_por_Estado_Pyme</members>
+        <members>Seguros_ALFA_Pyme/Loss_Ratio_Pyme</members>
+        <members>Seguros_ALFA_Pyme/Polizas_por_Status_Pyme</members>
+        <members>Seguros_ALFA_Pyme/Prima_Emitida_por_Plan_Pyme</members>
+        <members>Seguros_ALFA_Pyme/Polizas_Proximas_a_Vencer_Pyme</members>
+        <members>Seguros_ALFA_Pyme/Prima_Emitida_por_Producto_Pyme</members>
+        <members>Seguros_ALFA_Pyme/Coberturas_Activas_por_Tipo_Pyme</members>
+        <members>Seguros_ALFA_Pyme/Cartera_Pyme_por_Industry</members>
+        <members>Seguros_ALFA_Pyme/Total_Prima_Emitida_Pyme</members>
+        <name>Report</name>
+    </types>
+    <types>
+        <members>Seguros_ALFA_Pyme/Tablero_Siniestralidad_Pyme_2026</members>
+        <members>Seguros_ALFA_Pyme/Tablero_Renovaciones_Pyme_2026</members>
+        <members>Seguros_ALFA_Pyme/Tablero_Produccion_Pyme_2026</members>
+        <name>Dashboard</name>
+    </types>
+    <version>62.0</version>
+</Package>
