@@ -112,8 +112,8 @@ This repo was built with [Claude Code](https://claude.com/product/claude-code) a
 
 1. Fork or clone this repo.
 2. Open a terminal in the repo root and run `claude` to launch Claude Code inside it.
-3. Enable **ultracode** mode (`/ultracode` toggle) for the multi-step build work — the runbooks and scripts assume a thorough execution style.
-4. Point Claude at whichever runbook or script you need. Claude reads the runbook and drives your org via the `sf` CLI and MCP tools.
+3. Claude will automatically load the **`CLAUDE.md`** file at the root of the repo — this gives it all the project conventions, critical technical knowledge (hidden validation rules, field naming traps, deploy workarounds), and the "never hardcode IDs" rule from the first prompt. No need to re-explain context each session.
+4. Point Claude at whichever runbook or script you need. It reads the runbook and drives your org via the `sf` CLI and MCP tools.
 
 ### Example prompts
 
@@ -125,11 +125,17 @@ Copy any of these into Claude Code, adapt the bracketed bits, and hit enter:
 - `I'm getting error "Cannot read properties null (reading 'groups')" when opening a Quote — search demo-metadata/learnings/rca-rlm-setup.md for the diagnosis and give me a fix checklist.`
 - `Extend the demo with a Block 7 for [feature X]. Follow the runbook template used by RUNBOOK_BLOCK6_REPORTING.md.`
 
-### Memory and continuity
+### CLAUDE.md — project knowledge that persists
 
-Claude Code's **memory system** persists project context between sessions. As you work, Claude accumulates notes under `~/.claude/projects/<sanitized-path>/memory/` (auto-memory) that survive across restarts and get replayed at the start of the next session over the same repo. Use `/remember ...` or an explicit "save this as memory" instruction to pin a specific learning (a fixed gotcha, an org ID convention, a preferred agenda) so future sessions inherit it.
+The **`CLAUDE.md`** file at the repo root is Claude Code's "project instructions" file — it's loaded automatically at the start of every session in this directory. It contains:
+- Key conventions (dynamic ID lookups, `--alias` convention, required env vars)
+- Every critical technical gotcha discovered during this build (hidden validation rules, auto-derived fields, naming traps)
+- The SOAP deploy workaround for restricted environments
+- Structure reference for navigating the repo
 
-For meta-lessons on how the original build with Claude went — what worked, what to avoid — read [`demo-metadata/learnings/claude-code-lessons.md`](demo-metadata/learnings/claude-code-lessons.md) before your first serious session.
+**If you learn something new** during your session (a new gotcha, a new field behavior, a setup quirk), update `CLAUDE.md` with it so the next session starts with that knowledge baked in. This is more reliable than auto-memory because it's version-controlled and portable across machines.
+
+For the full narrative of meta-lessons on how the original build with Claude went — what worked, what to avoid — read [`demo-metadata/learnings/claude-code-lessons.md`](demo-metadata/learnings/claude-code-lessons.md).
 
 ### Recommended workflow
 
