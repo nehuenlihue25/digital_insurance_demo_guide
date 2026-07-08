@@ -3,6 +3,10 @@
 ## Purpose
 Everything needed to (1) replicate the Insurance on Core Pyme demo in another org, and (2) avoid the same mistakes made during this build.
 
+## ⚠️ Required org
+
+**These scripts and metadata packages are designed for the `FINS QBranch - INS on Core IDO`.** That IDO is the only one that ships with the full stack pre-provisioned (Digital Insurance + Revenue Cloud Advanced + Product Configurator + OmniStudio + Context Service + Salesforce Pricing + all Permission Set Licenses). Provision it from the **STORM app in Slack** (`@STORM` → request `FINS QBranch - INS on Core IDO`) or from **Solutions Workspace**. Any other org will fail on the license/permission checks in `00-prerequisites.sh`.
+
 ## Quick context
 - Client: Seguros ALFA (Grupo Aval Colombia)
 - Presentation: 2026-07-09 (Thursday) 8:00 AM – 2:00 PM Colombia time

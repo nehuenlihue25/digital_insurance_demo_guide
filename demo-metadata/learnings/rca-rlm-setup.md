@@ -1,10 +1,14 @@
 # Revenue Cloud Advanced (RCA) — Setup notes for Digital Insurance orgs
 
+## ⚠️ Use the right IDO first
+
+Before you spend an hour hunting license gaps: **use the IDO `FINS QBranch - INS on Core IDO`**. Provision it from the **STORM app in Slack** (DM `@STORM` or use the STORM channel to request the IDO by name) or from **Solutions Workspace**. That IDO ships with the entire RCA + Digital Insurance stack already provisioned — every PSL and Permission Set listed below is Active, waiting to be assigned to your user. Any other org will require you to chase down licenses via account team and re-run this checklist several times.
+
 ## Context
 
 This document covers the relationship between Digital Insurance (Insurance on Core) and Revenue Cloud Advanced (RCA), and how the Product Configuration LWC + Quote flow work when both coexist.
 
-## Critical PSLs (all Active in Q-Branch demo orgs)
+## Critical PSLs (all Active in the FINS QBranch — INS on Core IDO)
 
 ### Umbrella
 - `RevenueLifecycleManagementUserPsl` — Revenue Cloud User (35 seats)

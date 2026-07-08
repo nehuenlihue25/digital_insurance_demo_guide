@@ -4,6 +4,17 @@
 
 This repo is designed to be **forked and adapted**. The concrete demo values (Seguros ALFA as the carrier, Grupo Aval as the parent group, Panadería La Espiga as the SME account) are placeholders — swap them for your own client.
 
+## ⚠️ Required org — read this FIRST
+
+**Deploy this demo on the IDO `FINS QBranch - INS on Core IDO`.** Do not use any other org — the whole guide assumes this IDO because it is the only one that ships with the full stack pre-provisioned (Digital Insurance + Revenue Cloud Advanced + Product Configurator + Advanced Configurator Designer + OmniStudio + Context Service + Salesforce Pricing + all the Permission Set Licenses). Any other Digital Insurance org will send you into hours of hunting down license and permission gaps before the scripts even start working.
+
+Provision the IDO from either:
+
+- **STORM app in Slack** — DM `@STORM` (or in the STORM channel) → request the IDO named `FINS QBranch - INS on Core IDO`
+- **Solutions Workspace** — pick the same IDO from the SE catalog
+
+Once your IDO is ready, authenticate `sf` CLI against it (`sf org login web --alias <your-alias>`) and continue with the Quick Start below.
+
 ## What's in this repo
 
 ### Operational documents (root)
@@ -26,9 +37,9 @@ This repo is designed to be **forked and adapted**. The concrete demo values (Se
 ## Quick start — Replicate the demo in your org
 
 Prerequisites:
-- Org with **Digital Insurance + Revenue Cloud Advanced (RCA)** enabled
-- `sf` CLI authenticated with an alias for your org
-- User with the Digital Insurance + RCA Permission Set Licenses (see `demo-metadata/learnings/rca-rlm-setup.md`)
+- **The `FINS QBranch - INS on Core IDO`** provisioned via STORM (Slack) or Solutions Workspace — see the ⚠️ section above
+- `sf` CLI authenticated with an alias pointing at your IDO
+- Your demo user assigned all the PSLs listed in `demo-metadata/learnings/rca-rlm-setup.md` (most are pre-provisioned in the IDO, but assignment to the user is manual)
 
 ```bash
 export ORG=<your-org-alias>

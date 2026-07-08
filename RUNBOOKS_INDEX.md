@@ -14,6 +14,8 @@
 
 This file is the **starting point**. Read it first, run the checklist, and only then open the four block runbooks. Each block runbook assumes the master checklist has already been executed and that you have the org open with the correct tabs.
 
+> ⚠️ **Org note (do not skip):** these runbooks are written for the IDO **`FINS QBranch - INS on Core IDO`**, provisioned from the **STORM app in Slack** or **Solutions Workspace**. It's the only org type where every PSL and setup dependency (Digital Insurance + Revenue Cloud Advanced + Product Configurator + OmniStudio + Context Service + Salesforce Pricing) is pre-provisioned. Using any other org means chasing license and setup gaps for hours before the click paths become executable.
+
 Recommended order for Wednesday night, 2026-07-08:
 
 1. Read this INDEX in full (15 min).

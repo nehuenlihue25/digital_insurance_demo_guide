@@ -5,6 +5,10 @@
 # Verifies that the target org has EVERYTHING needed BEFORE running the setup
 # scripts for the Seguros ALFA demo (Insurance on Core + RCA + DIS).
 #
+# >>> IMPORTANT: run this against the IDO "FINS QBranch - INS on Core IDO"     <<<
+# >>> Provision it from the STORM Slack app or Solutions Workspace.            <<<
+# >>> Any other org will fail these checks — the whole guide assumes this IDO. <<<
+#
 # Usage:
 #   ./00-prerequisites.sh <org-alias>
 #   ORG=<org-alias> ./00-prerequisites.sh
@@ -18,6 +22,15 @@ set -euo pipefail
 
 # The sf CLI writes to a log file that can fail in this environment; disable it.
 export SF_DISABLE_LOG_FILE=true
+
+# ---------- Prominent banner about the required IDO -------------------------
+echo ""
+echo "============================================================================"
+echo "  Required org: FINS QBranch - INS on Core IDO"
+echo "  Provision via:  STORM app in Slack  OR  Solutions Workspace"
+echo "  This script will now verify that your target org matches the IDO stack."
+echo "============================================================================"
+echo ""
 
 # ---------- Target org resolution -------------------------------------------
 # Accepts alias as $1 or as the ORG environment variable.
