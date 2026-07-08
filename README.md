@@ -13,7 +13,57 @@ Provision the IDO from either:
 - **STORM app in Slack** — DM `@STORM` (or in the STORM channel) → request the IDO named `FINS QBranch - INS on Core IDO`
 - **Solutions Workspace** — pick the same IDO from the SE catalog
 
-Once your IDO is ready, authenticate `sf` CLI against it (`sf org login web --alias <your-alias>`) and continue with the Quick Start below.
+Once your IDO is ready, continue to the **Toolchain setup** below and then to the **Quick start**.
+
+## 🧰 Toolchain setup
+
+You'll be driving this demo through Claude Code plus a couple of external tools. Install and wire them up once — everything after that becomes short prompts to Claude.
+
+### 1. Salesforce CLI (`sf`)
+
+Install the Salesforce CLI (v2, the `sf` command, not the deprecated `sfdx`):
+
+- macOS: `brew install --cask sf-cli`
+- Windows / Linux: [install instructions](https://developer.salesforce.com/tools/salesforcecli)
+- Verify: `sf --version`
+
+Log in to your IDO and **give it a short, memorable alias**. Every script and every runbook step assumes an alias — never the raw `storm.xxx@salesforce.com` username. Convention we use across the repo: short kebab-case name of the demo target, e.g. `ins-alfa`, `dins-acme`, `alfa-demo`.
+
+```bash
+sf org login web --alias ins-alfa          # opens a browser, log in, alias saved
+sf org list                                 # confirm the alias appears
+sf config set target-org=ins-alfa           # optional: make it the default so
+                                            # you can skip --target-org in ad-hoc queries
+```
+
+From here on, **every `sf` command in the scripts and runbooks uses `--target-org ins-alfa`** (or whatever alias you chose, exported as `$ORG`). If you skip the alias step, the scripts fail on the first query — they resolve targets by alias, not by username.
+
+### 2. MCP servers for Claude Code
+
+Model Context Protocol (MCP) servers expose external tools to Claude Code so it can query docs, drive orgs, and read team channels without leaving the chat. Two are essential for this repo; a third is optional:
+
+**Essential — Salesforce Docs MCP** — lets Claude search and fetch Salesforce Help + Developer Documentation directly. Every design/debug conversation in this repo used it (`salesforce_docs_search`, `salesforce_docs_fetch`). Without it, Claude falls back to training data (stale). Install:
+
+```bash
+# From your Claude Code config (~/.claude/config.json or via the /config UI):
+# add the MCP server named 'salesforce-docs'
+# (see internal SE onboarding docs for the exact endpoint URL)
+```
+
+**Essential — `sf` CLI available in your PATH** — Claude Code drives the `sf` CLI through the built-in Bash tool. If Salesforce releases (or your team has) an official MCP wrapper for the CLI, install it too — Claude will auto-detect and use it in place of raw Bash. Either way, `sf` must be on your PATH.
+
+**Optional — Slack MCP** — helpful if you want Claude to read your team channels (RFP threads, demo prep discussions, screenshots) and use them as context. Not required to run the scripts, but useful during the design phase (as we used it during the ALFA build).
+
+### 3. Verify the toolchain
+
+```bash
+sf --version                                # >= 2.x
+sf org list                                 # your IDO alias must show 'Connected'
+sf data query --target-org <your-alias> \
+   --query "SELECT COUNT() FROM Product2 WHERE Type='Bundle'"
+```
+
+If all three commands succeed, you're ready for the **Quick start** below.
 
 ## What's in this repo
 

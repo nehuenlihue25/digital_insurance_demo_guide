@@ -7,6 +7,13 @@ Everything needed to (1) replicate the Insurance on Core Pyme demo in another or
 
 **These scripts and metadata packages are designed for the `FINS QBranch - INS on Core IDO`.** That IDO is the only one that ships with the full stack pre-provisioned (Digital Insurance + Revenue Cloud Advanced + Product Configurator + OmniStudio + Context Service + Salesforce Pricing + all Permission Set Licenses). Provision it from the **STORM app in Slack** (`@STORM` → request `FINS QBranch - INS on Core IDO`) or from **Solutions Workspace**. Any other org will fail on the license/permission checks in `00-prerequisites.sh`.
 
+## Tooling prerequisites (30-second summary)
+
+- **`sf` CLI (v2)** installed and available on your PATH.
+- **Aliased login to your IDO**: `sf org login web --alias <your-alias>` (use a short kebab-case name like `ins-alfa`). Every script here calls `--target-org "$ORG"`, so the alias is what makes them portable across orgs — never hardcode a username.
+- **Salesforce Docs MCP** enabled in Claude Code if you're going to prompt Claude for design or debugging help while running the scripts (highly recommended). Without it, Claude can't consult live Salesforce docs.
+- See the root README's **🧰 Toolchain setup** section for install commands.
+
 ## Quick context
 - Client: Seguros ALFA (Grupo Aval Colombia)
 - Presentation: 2026-07-09 (Thursday) 8:00 AM – 2:00 PM Colombia time
