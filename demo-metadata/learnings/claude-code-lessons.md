@@ -1,85 +1,85 @@
-# Lecciones para Claude Code — Digital Insurance demo builds
+# Lessons for Claude Code — Digital Insurance demo builds
 
-Este documento es "de mí para mí". Si el próximo Claude Code (o yo en otra sesión) construye una demo similar, leer esto primero.
+This document is "from me to me." If the next Claude Code (or myself in another session) builds a similar demo, read this first.
 
-## Lección 1: NO afirmar diagnósticos sin evidencia dura
+## Lesson 1: DO NOT assert diagnoses without hard evidence
 
-**Qué hice mal en esta demo**: en dos momentos declaré con confianza que "RCA no está instalado en la org", primera vez cuando SalesTransactionDefinition dio INVALID_TYPE, segunda vez cuando SalesTransactionType tenía 0 records. Ambas veces era falso: RCA ESTABA instalado, sólo faltaban PSLs/PS al usuario.
+**What I did wrong on this demo**: on two occasions I confidently declared that "RCA is not installed in the org," the first time when SalesTransactionDefinition returned INVALID_TYPE, the second time when SalesTransactionType had 0 records. Both times it was false: RCA WAS installed — the user simply lacked the required PSLs/PS.
 
-**Regla**: cuando un sObject devuelve INVALID_TYPE o NOT_SUPPORTED, tratar como HIPÓTESIS "no accesible al usuario", no como CONFIRMACIÓN "objeto no existe". Verificar con:
-1. Query PSLs disponibles en la org (no solo las asignadas al user)
-2. Cross-reference con otros indicadores (fields relacionados en objetos vecinos — ej. Quote.CalculationStatus con 20+ estados RCA es evidence irrefutable que RCA está)
-3. Asignar TODAS las PSLs candidatas al usuario y re-query
-4. Solo declarar "no instalado" tras confirmar el tercer intento
+**Rule**: when a sObject returns INVALID_TYPE or NOT_SUPPORTED, treat it as a HYPOTHESIS "not accessible to this user," not as CONFIRMATION "object does not exist." Verify with:
+1. Query available PSLs in the org (not just the ones assigned to the user)
+2. Cross-reference with other indicators (related fields on neighboring objects — e.g., Quote.CalculationStatus with 20+ RCA states is irrefutable evidence that RCA is there)
+3. Assign ALL candidate PSLs to the user and re-query
+4. Only declare "not installed" after confirming on the third attempt
 
-## Lección 2: Los nombres de sObjects no son intuitivos
+## Lesson 2: sObject names are not intuitive
 
-**Qué hice mal**: usé `ClaimAssessment`, `ClaimReserve`, `ClaimPayment`, `ClaimAdjuster` en el spec inicial — TODOS inventados. Los reales son diferentes (ver `digital-insurance-gotchas.md`).
+**What I did wrong**: I used `ClaimAssessment`, `ClaimReserve`, `ClaimPayment`, `ClaimAdjuster` in the initial spec — ALL made up. The real ones are different (see `digital-insurance-gotchas.md`).
 
-**Regla**: antes de spec-ear, ejecutar `sf sobject list --sobject standard` filtrando por prefix ("Claim", "Insurance", "Product") y trabajar SOLO con los que aparezcan. NO extrapolar desde patrones de otras clouds (CG, FSC generic).
+**Rule**: before speccing anything, run `sf sobject list --sobject standard` filtering by prefix ("Claim", "Insurance", "Product") and work ONLY with what actually shows up. DO NOT extrapolate from patterns in other clouds (CG, generic FSC).
 
-## Lección 3: Fields required NO WRITABLES son un patrón, no una excepción
+## Lesson 3: Required NON-WRITABLE fields are a pattern, not an exception
 
-**Qué hice mal**: Product2.ProductClass, ProductRelatedComponent.ParentProductRole y ChildProductRole, Quote.AccountId (post-create), Quote.OpportunityId (post-create), TransactionAmount vs "Amount" en InsurancePolicyTransaction... todos me dieron sorpresa la primera vez.
+**What I did wrong**: Product2.ProductClass, ProductRelatedComponent.ParentProductRole and ChildProductRole, Quote.AccountId (post-create), Quote.OpportunityId (post-create), TransactionAmount vs "Amount" on InsurancePolicyTransaction... they all surprised me the first time.
 
-**Regla**: al planear un INSERT/UPDATE, siempre correr `sf sobject describe` primero y filtrar por `createable=false OR updateable=false`. Estos fields no van en el payload aunque el schema diga `nillable=false`.
+**Rule**: when planning an INSERT/UPDATE, always run `sf sobject describe` first and filter by `createable=false OR updateable=false`. These fields do not belong in the payload even if the schema says `nillable=false`.
 
-## Lección 4: Sandbox constraints requieren workarounds SOAP
+## Lesson 4: Sandbox constraints require SOAP workarounds
 
-**Qué hice mal**: intenté 3-4 veces `sf project deploy start` esperando que funcionara. Siempre bloquea por `~/.sfdx/` write. Al final resolvimos con SOAP directo — que funciona perfecto pero descubrirlo tomó tiempo.
+**What I did wrong**: I tried `sf project deploy start` 3-4 times hoping it would work. It always blocks on writes to `~/.sfdx/`. In the end we solved it with direct SOAP — which works perfectly, but figuring that out took time.
 
-**Regla**: si el sandbox tiene write restrictions, NO intentar herramientas que asuman $HOME writable. Ir directo al workaround:
+**Rule**: if the sandbox has write restrictions, DO NOT try tools that assume $HOME is writable. Go straight to the workaround:
 - Deploy metadata → SOAP `services/Soap/m/62.0`
 - Retrieve metadata → SOAP retrieve
-- Auth refresh → hacer login web manual fuera del sandbox
+- Auth refresh → do a manual web login outside the sandbox
 
-## Lección 5: Los workflow diagnósticos deben ser adversariales
+## Lesson 5: Diagnostic workflows must be adversarial
 
-**Qué hice mal**: workflows tempranos aceptaban conclusiones optimistas ("plan build viable, todos los objetos accesibles") cuando en realidad faltaban gaps críticos. Los critique passes eran muy suaves.
+**What I did wrong**: early workflows accepted optimistic conclusions ("plan build viable, all objects accessible") when in reality there were critical gaps. The critique passes were too soft.
 
-**Regla**: para task ultracode, incluir SIEMPRE una Phase de critique adversarial que:
-1. Verifica cada claim del spec contra data real
-2. Corre tests concretos (INSERT de prueba, LWC render test)
-3. Falla explícitamente si algo no coincide
-4. Prefiere resultados null a resultados speculativos
+**Rule**: for ultracode tasks, ALWAYS include an adversarial critique Phase that:
+1. Verifies every claim in the spec against real data
+2. Runs concrete tests (test INSERTs, LWC render tests)
+3. Fails explicitly if anything doesn't line up
+4. Prefers null results to speculative results
 
-## Lección 6: Sesiones a lo largo del día tienen problemas de auth
+## Lesson 6: Sessions spread across the day have auth issues
 
-**Qué me pasa**: entre sesión y sesión, el access token expira. `sf org display` con sandbox intenta refresh via `~/.sfdx/` que bloquea. La solución es re-login manual — pero eso rompe el flujo.
+**What happens to me**: between one session and the next, the access token expires. `sf org display` against a sandbox tries to refresh via `~/.sfdx/`, which is blocked. The fix is a manual re-login — but that breaks the flow.
 
-**Regla**: si la sesión va a durar >2h de reloj, hacer prompt al usuario para que haga `sf org login web` proactivamente al inicio, incluso si el token actual funciona. Le dedico 1 tool call al principio para verificar auth freshness.
+**Rule**: if the session is going to run for more than 2 clock-hours, prompt the user to run `sf org login web` proactively at the start, even if the current token still works. I dedicate 1 tool call up front to verify auth freshness.
 
-## Lección 7: OmniScript + Product Config LWC es el path canónico, no INSERT via API
+## Lesson 7: OmniScript + Product Config LWC is the canonical path, not INSERT via API
 
-**Qué hice mal**: intenté construir el Quote Pyme via `sf data create record --sobject QuoteLineItem` con `ParentQuoteLineItemId` linking manual. FALLÓ (ParentQuoteLineItemId no es writable directo). La única forma correcta de crear un Quote con estructura RCA es via el OmniScript CreateQuoteDCT2 → Browse Catalogs → Configure LWC.
+**What I did wrong**: I tried to build the Pyme Quote via `sf data create record --sobject QuoteLineItem` with a manual `ParentQuoteLineItemId` link. FAILED (ParentQuoteLineItemId is not directly writable). The only correct way to create a Quote with RCA structure is via the CreateQuoteDCT2 OmniScript → Browse Catalogs → Configure LWC.
 
-**Regla**: para demos RCA/Digital Insurance:
-1. Los Product2 + PADs + Coverages + Classifications SÍ se crean via API
-2. Los Quotes CON ESTRUCTURA de bundle+coverages NO. Requieren el OmniScript/LWC.
-3. Documentar en el runbook que los pasos runtime son UI-only y no automatizables
+**Rule**: for RCA / Digital Insurance demos:
+1. Product2 + PADs + Coverages + Classifications CAN be created via API
+2. Quotes WITH bundle+coverage STRUCTURE CANNOT. They require the OmniScript/LWC.
+3. Document in the runbook that the runtime steps are UI-only and not automatable
 
-## Lección 8: Ultracode workflows aceleran cuando hay paralelismo real
+## Lesson 8: Ultracode workflows speed up when there is real parallelism
 
-**Qué hice bien**: los workflows con 3-8 agentes paralelos investigando aspectos ortogonales (docs research + org queries + FlexiPage inspection) fueron 3-5x más rápidos que hacer serial.
+**What I did right**: workflows with 3-8 parallel agents investigating orthogonal aspects (docs research + org queries + FlexiPage inspection) were 3-5x faster than doing it serially.
 
-**Qué hice mal**: algunos workflows tuvieron agentes con prompts idénticos o overlapping — cero paralelismo real, solo overhead.
+**What I did wrong**: some workflows had agents with identical or overlapping prompts — zero real parallelism, only overhead.
 
-**Regla**: antes de lanzar workflow, dibujar el diagrama:
-- 3+ items ortogonales que se pueden hacer en paralelo → workflow YES
-- 1-2 items dependientes o pequeños → agent directo o Bash directo
+**Rule**: before launching a workflow, draw the diagram:
+- 3+ orthogonal items that can run in parallel → workflow YES
+- 1-2 dependent or small items → direct agent or direct Bash
 
-## Lección 9: Documentar fallbacks OBLIGATORIAMENTE
+## Lesson 9: Document fallbacks MANDATORILY
 
-**Qué hice bien esta demo**: cada runbook tiene sección "fallback" en cada Paso. En vivo esto salvó tiempo cuando algún click no cargaba como esperado.
+**What I did right on this demo**: every runbook has a "fallback" section in each Step. Live, this saved time when a click didn't load as expected.
 
-**Regla**: cada runbook step DEBE tener 1 línea "si no aparece X, hacer Y". No opcional.
+**Rule**: every runbook step MUST have a 1-line "if X doesn't appear, do Y." Not optional.
 
-## Lección 10: Memoria persistente para el próximo Claude
+## Lesson 10: Persistent memory for the next Claude
 
-Después de esta demo, actualicé `~/.claude/projects/-Users-nlobo-claude-projects-Grupo-Aval-Insurance/memory/` con:
-- `project_seguros_alfa.md` — contexto del proyecto
-- `feedback_digital_insurance_product_config.md` — gotchas técnicos
-- `feedback_no_hardcoded_ids.md` — regla de lookups dinámicos
-- `feedback_sf_cli_sandbox.md` — env vars requeridos
+After this demo, I updated `~/.claude/projects/-Users-nlobo-claude-projects-Grupo-Aval-Insurance/memory/` with:
+- `project_seguros_alfa.md` — project context
+- `feedback_digital_insurance_product_config.md` — technical gotchas
+- `feedback_no_hardcoded_ids.md` — dynamic-lookup rule
+- `feedback_sf_cli_sandbox.md` — required env vars
 
-El próximo Claude en este directorio va a leer esto automáticamente. ESE es el punto de la memoria persistente.
+The next Claude in this directory will read this automatically. THAT is the point of persistent memory.

@@ -1,46 +1,46 @@
 #!/usr/bin/env bash
 # =============================================================================
-# 02-bloque5-clauses.sh
+# 02-block5-clauses.sh
 # -----------------------------------------------------------------------------
-# Crea las cláusulas y exclusiones a NIVEL DE PRODUCTO para el bundle
-# "Plan Empresarial" del portafolio segPymeEmpresarial (Seguros ALFA).
+# Creates PRODUCT-LEVEL clauses and exclusions for the "Plan Empresarial"
+# bundle in the segPymeEmpresarial portfolio (Seguros ALFA).
 #
-# NOTA IMPORTANTE:
-#   Este script crea las CLAUSES a nivel de producto (InsuranceClause +
-#   InsuranceProductClause + VariableMap). Las clauses a nivel de póliza
-#   (InsurancePolicyProductClause) se crean en el script 03-bloque2-policy.sh
-#   cuando se materializan sobre POL-PYME-2026-0001.
+# IMPORTANT NOTE:
+#   This script creates the CLAUSES at the product level (InsuranceClause +
+#   InsuranceProductClause + VariableMap). Policy-level clauses
+#   (InsurancePolicyProductClause) are created by 03-block2-policy.sh when
+#   the policy POL-PYME-2026-0001 is materialized.
 #
-# Objetos que se crean:
-#   1) InsuranceClause                (6 registros: 3 Clause + 3 Exclusion)
-#   2) InsuranceProductClause         (6 junctions al bundle Plan Empresarial)
-#   3) InsProductClauseVariableMap    (3 tokens dinámicos)
+# Objects created:
+#   1) InsuranceClause                (6 records: 3 Clause + 3 Exclusion)
+#   2) InsuranceProductClause         (6 junctions to the Plan Empresarial bundle)
+#   3) InsProductClauseVariableMap    (3 dynamic tokens)
 #
-# Reglas:
-#   - Idempotencia: si ya existen, se hace UPDATE en vez de INSERT.
-#   - Todos los lookups se hacen dinámicamente (Product2, InsuranceClause).
-#   - Campo correcto: `Type` (NO `ClauseType`).
-#   - Prefijo SF_DISABLE_LOG_FILE=true en todos los sf calls.
+# Rules:
+#   - Idempotent: if records already exist, UPDATE instead of INSERT.
+#   - All lookups are performed dynamically (Product2, InsuranceClause).
+#   - Correct field: `Type` (NOT `ClauseType`).
+#   - Prefix SF_DISABLE_LOG_FILE=true on every sf invocation.
 # =============================================================================
 
 set -euo pipefail
 
 # -----------------------------------------------------------------------------
-# Configuración del entorno
+# Environment configuration
 # -----------------------------------------------------------------------------
 export SF_DISABLE_LOG_FILE=true
 
 TARGET_ORG="${TARGET_ORG:-alfa-storm}"
-BUNDLE_CODE="segPymeEmpresarial"    # Code del Product2 bundle "Plan Empresarial"
+BUNDLE_CODE="segPymeEmpresarial"    # ProductCode of the Product2 bundle "Plan Empresarial"
 
 echo ">> Target org: ${TARGET_ORG}"
 echo ">> Bundle code: ${BUNDLE_CODE}"
 
 # -----------------------------------------------------------------------------
-# Utilidades
+# Utilities
 # -----------------------------------------------------------------------------
 
-# Ejecuta SOQL y devuelve el primer valor de la primera columna (o vacío).
+# Runs a SOQL query and returns the first value of the first column (or empty).
 soql_first() {
   local query="$1"
   SF_DISABLE_LOG_FILE=true sf data query \
@@ -55,7 +55,7 @@ if not records:
     print('')
     sys.exit(0)
 row = records[0]
-# tomar la primera columna no-attributes
+# grab the first non-attributes column
 for k, v in row.items():
     if k == 'attributes':
         continue
@@ -65,13 +65,13 @@ print('')
 "
 }
 
-# Escapa comillas simples para SOQL.
+# Escapes single quotes for SOQL.
 soql_esc() {
   printf '%s' "$1" | sed "s/'/\\\\'/g"
 }
 
-# INSERT o UPDATE genérico por (SObject, campo-unique, valor-unique, KV pairs).
-# Uso: upsert_by SObject UniqueField UniqueValue "Field1=Value1" "Field2=Value2" ...
+# Generic INSERT or UPDATE by (SObject, unique-field, unique-value, KV pairs).
+# Usage: upsert_by SObject UniqueField UniqueValue "Field1=Value1" "Field2=Value2" ...
 upsert_by() {
   local sobject="$1"; shift
   local ukey="$1"; shift
@@ -80,7 +80,7 @@ upsert_by() {
   local existing_id
   existing_id=$(soql_first "SELECT Id FROM ${sobject} WHERE ${ukey}='$(soql_esc "${uval}")' LIMIT 1")
 
-  # Construir los -v args
+  # Build the -v args
   local -a flags=()
   local pair
   for pair in "$@"; do
@@ -113,24 +113,24 @@ print(d.get('result', {}).get('id', ''))
 }
 
 # -----------------------------------------------------------------------------
-# 0) Localizar el bundle Product2 "Plan Empresarial"
+# 0) Locate the "Plan Empresarial" Product2 bundle
 # -----------------------------------------------------------------------------
 echo ""
-echo ">> [0/4] Localizando Product2 bundle (Code='${BUNDLE_CODE}')..."
+echo ">> [0/4] Locating Product2 bundle (Code='${BUNDLE_CODE}')..."
 BUNDLE_ID=$(soql_first "SELECT Id FROM Product2 WHERE ProductCode='${BUNDLE_CODE}' LIMIT 1")
 
 if [[ -z "${BUNDLE_ID}" ]]; then
-  echo "ERROR: no se encontró Product2 con ProductCode='${BUNDLE_CODE}'."
-  echo "       Ejecuta primero el script que crea el bundle Plan Empresarial."
+  echo "ERROR: no Product2 found with ProductCode='${BUNDLE_CODE}'."
+  echo "       Run the script that creates the Plan Empresarial bundle first."
   exit 1
 fi
 echo "   Bundle Product2 Id = ${BUNDLE_ID}"
 
 # -----------------------------------------------------------------------------
-# 1) Crear las 6 InsuranceClause (3 Clause + 3 Exclusion)
+# 1) Create the 6 InsuranceClause records (3 Clause + 3 Exclusion)
 # -----------------------------------------------------------------------------
 echo ""
-echo ">> [1/4] Creando InsuranceClause (6 registros)..."
+echo ">> [1/4] Creating InsuranceClause (6 records)..."
 
 EFFECTIVE_DATE="2026-01-01"
 EXPIRATION_DATE="2030-12-31"
@@ -180,7 +180,7 @@ CLAUSE_3_ID=$(upsert_by "InsuranceClause" "Code" "${CLAUSE_3_CODE}" \
   "EffectiveDate=${EFFECTIVE_DATE}" \
   "ExpirationDate=${EXPIRATION_DATE}")
 
-# ---- 1.4 Cláusula de Coaseguro (Manual, con token) ------------------------
+# ---- 1.4 Cláusula de Coaseguro (Manual, with token) -----------------------
 CLAUSE_4_NAME="Cláusula de Coaseguro"
 CLAUSE_4_CODE="coaseguro"
 CLAUSE_4_TEXT="El Asegurado participará en cada siniestro amparado con un coaseguro obligatorio del {{porcentajeCoaseguro}}% del valor de la pérdida indemnizable, una vez aplicado el deducible correspondiente. Este porcentaje será retenido por Seguros ALFA al momento de liquidar la indemnización y no podrá ser objeto de subrogación contra terceros."
@@ -195,7 +195,7 @@ CLAUSE_4_ID=$(upsert_by "InsuranceClause" "Code" "${CLAUSE_4_CODE}" \
   "EffectiveDate=${EFFECTIVE_DATE}" \
   "ExpirationDate=${EXPIRATION_DATE}")
 
-# ---- 1.5 Exclusión Actividades Extremas (AutoAdded, con token) ------------
+# ---- 1.5 Exclusión Actividades Extremas (AutoAdded, with token) -----------
 CLAUSE_5_NAME="Exclusión Actividades Extremas"
 CLAUSE_5_CODE="actividadesExt"
 CLAUSE_5_TEXT="Se excluyen expresamente de esta cobertura los siniestros ocurridos durante la práctica de actividades de alto riesgo, incluyendo pero no limitado a: paracaidismo, buceo profundo, alpinismo, motociclismo deportivo, automovilismo de competencia y cualquier actividad realizada bajo la influencia de {{sustanciasProhibidas}}. Se entiende por tales todas aquellas sustancias que alteren el estado de conciencia o la capacidad de reacción del Asegurado."
@@ -210,7 +210,7 @@ CLAUSE_5_ID=$(upsert_by "InsuranceClause" "Code" "${CLAUSE_5_CODE}" \
   "EffectiveDate=${EFFECTIVE_DATE}" \
   "ExpirationDate=${EXPIRATION_DATE}")
 
-# ---- 1.6 Cláusula de Deducible Mínimo (AutoAdded, con token) --------------
+# ---- 1.6 Cláusula de Deducible Mínimo (AutoAdded, with token) -------------
 CLAUSE_6_NAME="Cláusula de Deducible Mínimo"
 CLAUSE_6_CODE="deducibleMinPyme"
 CLAUSE_6_TEXT="En cada siniestro amparado por esta póliza, el Asegurado asumirá por su cuenta un deducible mínimo equivalente a {{deducibleMinimo}} pesos colombianos (COP), el cual será descontado del valor de la indemnización antes de la aplicación de cualquier otro coaseguro o participación. En ningún caso Seguros ALFA responderá por pérdidas inferiores a este monto."
@@ -226,7 +226,7 @@ CLAUSE_6_ID=$(upsert_by "InsuranceClause" "Code" "${CLAUSE_6_CODE}" \
   "ExpirationDate=${EXPIRATION_DATE}")
 
 echo ""
-echo "   InsuranceClause creadas/actualizadas:"
+echo "   InsuranceClause created/updated:"
 echo "     1) buenaFe             = ${CLAUSE_1_ID}"
 echo "     2) actosDolosos        = ${CLAUSE_2_ID}"
 echo "     3) guerraTerrorismo    = ${CLAUSE_3_ID}"
@@ -235,12 +235,12 @@ echo "     5) actividadesExt      = ${CLAUSE_5_ID}"
 echo "     6) deducibleMinPyme    = ${CLAUSE_6_ID}"
 
 # -----------------------------------------------------------------------------
-# 2) InsuranceProductClause (junctions Product2 <-> InsuranceClause)
+# 2) InsuranceProductClause (Product2 <-> InsuranceClause junctions)
 # -----------------------------------------------------------------------------
 echo ""
-echo ">> [2/4] Creando InsuranceProductClause (6 junctions al bundle)..."
+echo ">> [2/4] Creating InsuranceProductClause (6 junctions to the bundle)..."
 
-# Helper para upsert de un junction (una fila por (RootProductId, InsuranceClauseId)).
+# Helper to upsert a junction (one row per (RootProductId, InsuranceClauseId)).
 upsert_product_clause() {
   local clause_id="$1"
   local clause_code="$2"
@@ -284,7 +284,7 @@ IPC_5_ID=$(upsert_product_clause "${CLAUSE_5_ID}" "actividadesExt")
 IPC_6_ID=$(upsert_product_clause "${CLAUSE_6_ID}" "deducibleMinPyme")
 
 echo ""
-echo "   InsuranceProductClause creadas/actualizadas:"
+echo "   InsuranceProductClause created/updated:"
 echo "     1) buenaFe             -> ${IPC_1_ID}"
 echo "     2) actosDolosos        -> ${IPC_2_ID}"
 echo "     3) guerraTerrorismo    -> ${IPC_3_ID}"
@@ -293,16 +293,16 @@ echo "     5) actividadesExt      -> ${IPC_5_ID}"
 echo "     6) deducibleMinPyme    -> ${IPC_6_ID}"
 
 # -----------------------------------------------------------------------------
-# 3) InsProductClauseVariableMap (tokens dinámicos)
+# 3) InsProductClauseVariableMap (dynamic tokens)
 # -----------------------------------------------------------------------------
 echo ""
-echo ">> [3/4] Creando InsProductClauseVariableMap (3 tokens)..."
+echo ">> [3/4] Creating InsProductClauseVariableMap (3 tokens)..."
 
-# El campo Attribute apunta a un atributo del producto usando la convención:
+# The Attribute field points to a product attribute using the convention:
 #   <PortfolioCode>.Attribute.<Attribute_DeveloperName>
-# En este bundle el portafolio es segPymeEmpresarial.
+# For this bundle the portfolio is segPymeEmpresarial.
 
-# Helper para upsert de una variable-map. La clave lógica es
+# Helper to upsert a variable-map. The logical key is
 # (InsuranceProductClauseId, Token).
 upsert_variable_map() {
   local ipc_id="$1"
@@ -365,18 +365,18 @@ VMAP_3_ID=$(upsert_variable_map \
   "Currency")
 
 echo ""
-echo "   InsProductClauseVariableMap creadas/actualizadas:"
+echo "   InsProductClauseVariableMap created/updated:"
 echo "     1) porcentajeCoaseguro  -> ${VMAP_1_ID}"
 echo "     2) sustanciasProhibidas -> ${VMAP_2_ID}"
 echo "     3) deducibleMinimo      -> ${VMAP_3_ID}"
 
 # -----------------------------------------------------------------------------
-# 4) Resumen final
+# 4) Final summary
 # -----------------------------------------------------------------------------
 echo ""
-echo ">> [4/4] Bloque 5 (Product-level Clauses) completado exitosamente."
+echo ">> [4/4] Block 5 (Product-level Clauses) completed successfully."
 echo ""
-echo "   Recuerda: las clauses a NIVEL DE PÓLIZA (InsurancePolicyProductClause)"
-echo "   se crean en 03-bloque2-policy.sh, cuando se materializa la póliza"
-echo "   POL-PYME-2026-0001 sobre este bundle."
+echo "   Reminder: POLICY-LEVEL clauses (InsurancePolicyProductClause) are"
+echo "   created in 03-block2-policy.sh, when policy POL-PYME-2026-0001 is"
+echo "   materialized on top of this bundle."
 echo ""

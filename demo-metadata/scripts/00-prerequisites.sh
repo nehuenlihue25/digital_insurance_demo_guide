@@ -2,86 +2,86 @@
 # ============================================================================
 # 00-prerequisites.sh
 # ----------------------------------------------------------------------------
-# Verifica que la org destino tenga TODO lo necesario ANTES de correr
-# los scripts de setup de la demo Seguros ALFA (Insurance on Core + RCA + DIS).
+# Verifies that the target org has EVERYTHING needed BEFORE running the setup
+# scripts for the Seguros ALFA demo (Insurance on Core + RCA + DIS).
 #
-# Uso:
-#   ./00-prerequisites.sh <alias-org>
-#   ORG=<alias-org> ./00-prerequisites.sh
+# Usage:
+#   ./00-prerequisites.sh <org-alias>
+#   ORG=<org-alias> ./00-prerequisites.sh
 #
 # Exit codes:
-#   0 -> Todo OK, se puede proceder con los siguientes scripts
-#   1 -> Falta al menos un requisito crítico; NO correr los siguientes scripts
+#   0 -> All good, safe to proceed with the following scripts
+#   1 -> At least one critical prerequisite is missing; DO NOT run the next scripts
 # ============================================================================
 
 set -euo pipefail
 
-# sf CLI escribe a un log file que puede fallar en este entorno; desactivamos.
+# The sf CLI writes to a log file that can fail in this environment; disable it.
 export SF_DISABLE_LOG_FILE=true
 
-# ---------- Resolución de la org destino ------------------------------------
-# Acepta alias como $1 o como variable de entorno ORG.
+# ---------- Target org resolution -------------------------------------------
+# Accepts alias as $1 or as the ORG environment variable.
 ORG_ALIAS="${1:-${ORG:-}}"
 if [[ -z "${ORG_ALIAS}" ]]; then
-  echo "ERROR: debes pasar el alias de la org como \$1 o exportar ORG=<alias>." >&2
-  echo "Ejemplo: ./00-prerequisites.sh mi-sandbox" >&2
+  echo "ERROR: you must pass the org alias as \$1 or export ORG=<alias>." >&2
+  echo "Example: ./00-prerequisites.sh my-sandbox" >&2
   exit 1
 fi
 
-# ---------- Utilidades de output --------------------------------------------
-# Colores ANSI (verde/rojo/amarillo/reset). Si la terminal no soporta, se ven vacíos.
+# ---------- Output utilities ------------------------------------------------
+# ANSI colors (green/red/yellow/reset). If the terminal doesn't support them they render empty.
 GREEN=$'\033[0;32m'
 RED=$'\033[0;31m'
 YELLOW=$'\033[0;33m'
 BOLD=$'\033[1m'
 RESET=$'\033[0m'
 
-# Contadores globales para el resumen final.
+# Global counters for the final summary.
 PASS_COUNT=0
 FAIL_COUNT=0
 WARN_COUNT=0
 FAILED_CHECKS=()
 
 pass() {
-  # Marca un check como OK.
+  # Marks a check as OK.
   echo "  ${GREEN}✓${RESET} $1"
   PASS_COUNT=$((PASS_COUNT + 1))
 }
 
 fail() {
-  # Marca un check como CRÍTICO fallido.
+  # Marks a check as CRITICAL failed.
   echo "  ${RED}✗${RESET} $1"
   FAIL_COUNT=$((FAIL_COUNT + 1))
   FAILED_CHECKS+=("$1")
 }
 
 warn() {
-  # Advertencia: no bloquea pero conviene revisarla.
+  # Warning: non-blocking but worth reviewing.
   echo "  ${YELLOW}!${RESET} $1"
   WARN_COUNT=$((WARN_COUNT + 1))
 }
 
 section() {
-  # Encabezado de bloque de checks.
+  # Section header for a group of checks.
   echo ""
   echo "${BOLD}==> $1${RESET}"
 }
 
-# Wrapper para correr una query SOQL de forma silenciosa y devolver JSON.
-# Si falla la query, retorna string vacío para que el caller decida.
+# Wrapper to run a SOQL query silently and return JSON.
+# If the query fails, returns an empty string so the caller can decide.
 soql() {
   local query="$1"
   sf data query --target-org "${ORG_ALIAS}" --query "${query}" --json 2>/dev/null || echo ""
 }
 
-# Wrapper para queries sobre la Tooling API (metadatos como PermissionSet,
-# RecordType, AttributeDefinition, etc. cuando aplique).
+# Wrapper for Tooling API queries (metadata like PermissionSet, RecordType,
+# AttributeDefinition, etc. where applicable).
 soql_tooling() {
   local query="$1"
   sf data query --target-org "${ORG_ALIAS}" --use-tooling-api --query "${query}" --json 2>/dev/null || echo ""
 }
 
-# Extrae totalSize de un JSON de sf data query (0 si no parseable).
+# Extracts totalSize from a sf data query JSON payload (0 if not parseable).
 total_size() {
   local json="$1"
   echo "${json}" | python3 -c "import sys, json; d=json.load(sys.stdin); print(d.get('result',{}).get('totalSize',0))" 2>/dev/null || echo "0"
@@ -89,60 +89,60 @@ total_size() {
 
 echo "${BOLD}Prerequisites check — Seguros ALFA demo${RESET}"
 echo "Org alias: ${ORG_ALIAS}"
-echo "Fecha:     $(date '+%Y-%m-%d %H:%M:%S')"
+echo "Date:      $(date '+%Y-%m-%d %H:%M:%S')"
 
 # ============================================================================
-# CHECK 1: Conexión a la org
+# CHECK 1: Org connection
 # ----------------------------------------------------------------------------
-# Sin conexión no tiene sentido correr nada más; salimos temprano.
+# Without a connection there is no point running anything else; bail out early.
 # ============================================================================
-section "1. Conexión a la org"
+section "1. Org connection"
 
 if ORG_INFO=$(sf org display --target-org "${ORG_ALIAS}" --json 2>/dev/null); then
-  # Extraemos username e instance URL para dar contexto en el log.
+  # Pull username and instance URL to give context in the log.
   USERNAME=$(echo "${ORG_INFO}" | python3 -c "import sys,json;print(json.load(sys.stdin)['result']['username'])" 2>/dev/null || echo "unknown")
   INSTANCE_URL=$(echo "${ORG_INFO}" | python3 -c "import sys,json;print(json.load(sys.stdin)['result']['instanceUrl'])" 2>/dev/null || echo "unknown")
-  pass "Conectado como ${USERNAME}"
+  pass "Connected as ${USERNAME}"
   pass "Instance URL: ${INSTANCE_URL}"
 else
-  fail "No se pudo conectar a la org '${ORG_ALIAS}'. Ejecuta 'sf org login web -a ${ORG_ALIAS}' primero."
-  # Sin conexión, seguir es inútil.
+  fail "Could not connect to org '${ORG_ALIAS}'. Run 'sf org login web -a ${ORG_ALIAS}' first."
+  # No connection means there is no point continuing.
   echo ""
-  echo "${RED}${BOLD}FATAL:${RESET} sin conexión no podemos verificar el resto. Aborto."
+  echo "${RED}${BOLD}FATAL:${RESET} without a connection we cannot verify the rest. Aborting."
   exit 1
 fi
 
-# Recuperamos el UserId del usuario conectado para los checks de PSL/PermissionSet.
+# Look up the UserId of the connected user for PSL/PermissionSet checks.
 USER_ID_JSON=$(soql "SELECT Id FROM User WHERE Username='${USERNAME}' LIMIT 1")
 CURRENT_USER_ID=$(echo "${USER_ID_JSON}" | python3 -c "import sys,json;d=json.load(sys.stdin);print(d['result']['records'][0]['Id'])" 2>/dev/null || echo "")
 if [[ -z "${CURRENT_USER_ID}" ]]; then
-  fail "No pude recuperar UserId del usuario activo — checks de licencias/permsets abortarán."
+  fail "Could not resolve UserId for the active user — license/permset checks will be skipped."
 else
-  pass "UserId resuelto: ${CURRENT_USER_ID}"
+  pass "Resolved UserId: ${CURRENT_USER_ID}"
 fi
 
 # ============================================================================
-# CHECK 2: Permission Set Licenses (PSL) asignadas al usuario activo
+# CHECK 2: Permission Set Licenses (PSL) assigned to the active user
 # ----------------------------------------------------------------------------
-# Las PSL habilitan features de RCA, Digital Insurance, Configurator y Core
-# Pricing. Sin ellas, muchos objetos y flujos ni siquiera aparecen.
+# PSLs enable RCA, Digital Insurance, Configurator and Core Pricing features.
+# Without them, many objects and flows do not even appear.
 # ============================================================================
-section "2. Permission Set Licenses críticas asignadas al usuario"
+section "2. Critical Permission Set Licenses assigned to the user"
 
-# Lista de PSLs que la demo requiere. Nombres exactos del DeveloperName.
+# List of PSLs the demo requires. Exact DeveloperName values.
 CRITICAL_PSLS=(
   "RevenueLifecycleManagementUserPsl"        # RCA runtime
   "IndustriesConfiguratorPsl"                # Advanced Configurator
-  "DynamicRevenueOrchestratorUserPsl"        # DRO — orquestador de revenue
+  "DynamicRevenueOrchestratorUserPsl"        # DRO — revenue orchestrator
   "DigitalInsuranceClaimManagementUser"      # Digital Insurance Claims
-  "ClaimManagementAdmin"                     # Admin de Claims
+  "ClaimManagementAdmin"                     # Claims admin
   "DigitalInsurancePolicyAdminUserPsl"       # DIS policy admin
-  "CorePricingDesignTime"                    # Core Pricing design
+  "CorePricingDesignTime"                    # Core Pricing design time
   "CorePricingRunTime"                       # Core Pricing runtime
 )
 
 if [[ -n "${CURRENT_USER_ID}" ]]; then
-  # Traemos TODAS las PSL asignadas al usuario en una sola query y luego filtramos localmente.
+  # Pull ALL PSLs assigned to the user in a single query, then filter locally.
   PSL_JSON=$(soql "SELECT PermissionSetLicense.DeveloperName FROM PermissionSetLicenseAssign WHERE AssigneeId='${CURRENT_USER_ID}'")
   ASSIGNED_PSLS=$(echo "${PSL_JSON}" | python3 -c "
 import sys, json
@@ -156,28 +156,28 @@ except Exception:
 
   for psl in "${CRITICAL_PSLS[@]}"; do
     if echo "${ASSIGNED_PSLS}" | grep -qx "${psl}"; then
-      pass "PSL asignada: ${psl}"
+      pass "PSL assigned: ${psl}"
     else
-      fail "PSL NO asignada: ${psl} (asigna con: sf org assign permsetlicense -n ${psl})"
+      fail "PSL NOT assigned: ${psl} (assign with: sf org assign permsetlicense -n ${psl})"
     fi
   done
 else
-  fail "Skipping PSL checks — falta UserId."
+  fail "Skipping PSL checks — UserId missing."
 fi
 
 # ============================================================================
-# CHECK 3: Permission Sets críticos
+# CHECK 3: Critical Permission Sets
 # ----------------------------------------------------------------------------
-# Los PSL habilitan la licencia pero muchos features requieren además un
-# Permission Set concreto asignado. Verificamos que existan en la org y que
-# estén asignados al usuario.
+# PSLs enable the license, but many features additionally require a specific
+# Permission Set assigned. We verify they exist in the org and are assigned
+# to the user.
 # ============================================================================
-section "3. Permission Sets críticos asignados al usuario"
+section "3. Critical Permission Sets assigned to the user"
 
 CRITICAL_PERMSETS=(
-  "AdvancedConfiguratorDesigner"          # Diseñar rules de Configurator
-  "ProductConfigurationRulesDesigner"     # Rules de PCM
-  "IndustriesConfiguratorPlatformApi"     # API del configurator
+  "AdvancedConfiguratorDesigner"          # Author Configurator rules
+  "ProductConfigurationRulesDesigner"     # PCM rules
+  "IndustriesConfiguratorPlatformApi"     # Configurator API
   "ProductCatalogManagementViewer"        # PCM viewer
   "ProductDiscoveryUser"                  # Product Discovery
   "ContextServiceRuntimePsl"              # Context Service runtime
@@ -187,7 +187,7 @@ CRITICAL_PERMSETS=(
 )
 
 if [[ -n "${CURRENT_USER_ID}" ]]; then
-  # Traemos permsets asignados una sola vez.
+  # Pull assigned permsets a single time.
   PS_JSON=$(soql "SELECT PermissionSet.Name FROM PermissionSetAssignment WHERE AssigneeId='${CURRENT_USER_ID}'")
   ASSIGNED_PS=$(echo "${PS_JSON}" | python3 -c "
 import sys, json
@@ -201,72 +201,73 @@ except Exception:
 
   for ps in "${CRITICAL_PERMSETS[@]}"; do
     if echo "${ASSIGNED_PS}" | grep -qx "${ps}"; then
-      pass "PermSet asignado: ${ps}"
+      pass "PermSet assigned: ${ps}"
     else
-      # Antes de marcar fail, verificamos si al menos EXISTE en la org.
-      # Un PS no asignado suele resolverse con `sf org assign permset -n <name>`.
+      # Before marking as failed, check whether it at least EXISTS in the org.
+      # An unassigned PS is usually fixed with `sf org assign permset -n <name>`.
       EXISTS_JSON=$(soql "SELECT Id FROM PermissionSet WHERE Name='${ps}' LIMIT 1")
       EXISTS_COUNT=$(total_size "${EXISTS_JSON}")
       if [[ "${EXISTS_COUNT}" == "0" ]]; then
-        fail "PermSet '${ps}' NO EXISTE en la org (feature no habilitado o nombre distinto)"
+        fail "PermSet '${ps}' does NOT EXIST in the org (feature not enabled or different name)"
       else
-        fail "PermSet '${ps}' existe pero NO está asignado (asigna con: sf org assign permset -n ${ps})"
+        fail "PermSet '${ps}' exists but is NOT assigned (assign with: sf org assign permset -n ${ps})"
       fi
     fi
   done
 else
-  fail "Skipping PermissionSet checks — falta UserId."
+  fail "Skipping PermissionSet checks — UserId missing."
 fi
 
 # ============================================================================
-# CHECK 4: Accesibilidad de sObjects críticos
+# CHECK 4: Accessibility of critical sObjects
 # ----------------------------------------------------------------------------
-# Si un sObject no es queryable, o el feature no está habilitado, o el user
-# no tiene permisos. Igual falla; hay que investigar antes de correr scripts.
-# Nota: usamos LIMIT 0 para no traer data, solo validar que la query compila.
+# If an sObject is not queryable, either the feature is not enabled or the
+# user lacks permissions. Either way it fails; investigate before running
+# the scripts. Note: we use LIMIT 0 to avoid pulling data — just to validate
+# that the query compiles.
 # ============================================================================
-section "4. sObjects críticos accesibles"
+section "4. Critical sObjects accessible"
 
 CRITICAL_SOBJECTS=(
-  "InsurancePolicy"                       # Póliza base
-  "Claim"                                 # Siniestro
-  "ClaimCoverage"                         # Cobertura del siniestro
-  "ClaimCoveragePaymentDetail"            # Detalle de pago por cobertura
-  "ClaimPaymentSummary"                   # Resumen de pagos
-  "ClaimCovReserveAdjustment"             # Ajustes de reserva
-  "InsurancePolicyTransaction"            # Transacciones sobre la póliza
-  "InsuranceClause"                       # Cláusulas maestro
-  "InsuranceProductClause"                # Cláusulas por producto
-  "InsurancePolicyProductClause"          # Cláusulas por póliza
-  "InsProductClauseVariableMap"           # Mapeo de variables de cláusula
-  "Product2"                              # Producto (base RCA/PCM)
-  "ProductClassification"                 # Clasificación PCM
-  "AttributeDefinition"                   # Atributos PCM
-  "ProductAttributeDefinition"            # Attr por producto
-  "ProductComponentGroup"                 # Bundles/Groups
-  "ProductRelatedComponent"               # Relaciones bundle/child
+  "InsurancePolicy"                       # Base policy
+  "Claim"                                 # Claim
+  "ClaimCoverage"                         # Claim coverage
+  "ClaimCoveragePaymentDetail"            # Payment detail per coverage
+  "ClaimPaymentSummary"                   # Payment summary
+  "ClaimCovReserveAdjustment"             # Reserve adjustments
+  "InsurancePolicyTransaction"            # Policy transactions
+  "InsuranceClause"                       # Master clauses
+  "InsuranceProductClause"                # Clauses by product
+  "InsurancePolicyProductClause"          # Clauses by policy
+  "InsProductClauseVariableMap"           # Clause variable mapping
+  "Product2"                              # Product (RCA/PCM base)
+  "ProductClassification"                 # PCM classification
+  "AttributeDefinition"                   # PCM attributes
+  "ProductAttributeDefinition"            # Attribute per product
+  "ProductComponentGroup"                 # Bundles / groups
+  "ProductRelatedComponent"               # Bundle/child relationships
 )
 
 for obj in "${CRITICAL_SOBJECTS[@]}"; do
-  # LIMIT 0 valida DDL/permiso sin tocar data.
+  # LIMIT 0 validates DDL/permission without touching data.
   if sf data query --target-org "${ORG_ALIAS}" --query "SELECT Id FROM ${obj} LIMIT 0" --json >/dev/null 2>&1; then
-    pass "sObject accesible: ${obj}"
+    pass "sObject accessible: ${obj}"
   else
-    fail "sObject NO accesible: ${obj} (feature no habilitado o sin permisos de lectura)"
+    fail "sObject NOT accessible: ${obj} (feature not enabled or missing read permissions)"
   fi
 done
 
 # ============================================================================
-# CHECK 5: Campos de Quote/QuoteLineItem para RCA runtime
+# CHECK 5: Quote / QuoteLineItem fields for RCA runtime
 # ----------------------------------------------------------------------------
-# Quote.CalculationStatus con muchos valores es proxy de que el runtime RCA
-# está instalado. QuoteLineItem.RevenueCloudPackagingFlag es señal de que la
-# lógica de bundling packaging está disponible.
+# Quote.CalculationStatus having many values is a proxy for the RCA runtime
+# being installed. QuoteLineItem.RevenueCloudPackagingFlag signals that the
+# bundle packaging logic is available.
 # ============================================================================
-section "5. Campos de Quote/QuoteLineItem (proof de RCA runtime)"
+section "5. Quote / QuoteLineItem fields (RCA runtime proof)"
 
-# Contamos valores del picklist CalculationStatus vía Tooling API.
-# El runtime RCA suele traer 20+ valores; una org sin RCA trae <5.
+# Count values of the CalculationStatus picklist via Tooling API.
+# The RCA runtime usually ships with 20+ values; an org without RCA has <5.
 CS_JSON=$(soql_tooling "SELECT Metadata FROM FieldDefinition WHERE EntityDefinition.QualifiedApiName='Quote' AND QualifiedApiName='CalculationStatus'")
 CS_COUNT=$(echo "${CS_JSON}" | python3 -c "
 import sys, json
@@ -280,45 +281,45 @@ except Exception:
 " 2>/dev/null || echo "0")
 
 if [[ "${CS_COUNT}" -ge 20 ]]; then
-  pass "Quote.CalculationStatus tiene ${CS_COUNT} valores (RCA runtime instalado)"
+  pass "Quote.CalculationStatus has ${CS_COUNT} values (RCA runtime installed)"
 elif [[ "${CS_COUNT}" -gt 0 ]]; then
-  fail "Quote.CalculationStatus solo tiene ${CS_COUNT} valores (esperado 20+). RCA runtime probablemente NO instalado."
+  fail "Quote.CalculationStatus only has ${CS_COUNT} values (20+ expected). RCA runtime is likely NOT installed."
 else
-  fail "No pude leer Quote.CalculationStatus — RCA runtime posiblemente ausente."
+  fail "Could not read Quote.CalculationStatus — RCA runtime probably absent."
 fi
 
-# Verificamos que QuoteLineItem.RevenueCloudPackagingFlag exista.
+# Verify that QuoteLineItem.RevenueCloudPackagingFlag exists.
 QLI_FLAG_JSON=$(soql_tooling "SELECT Id FROM FieldDefinition WHERE EntityDefinition.QualifiedApiName='QuoteLineItem' AND QualifiedApiName='RevenueCloudPackagingFlag'")
 QLI_FLAG_COUNT=$(total_size "${QLI_FLAG_JSON}")
 if [[ "${QLI_FLAG_COUNT}" == "1" ]]; then
-  pass "QuoteLineItem.RevenueCloudPackagingFlag existe (packaging RCA disponible)"
+  pass "QuoteLineItem.RevenueCloudPackagingFlag exists (RCA packaging available)"
 else
-  fail "QuoteLineItem.RevenueCloudPackagingFlag NO existe (RCA packaging no habilitado)"
+  fail "QuoteLineItem.RevenueCloudPackagingFlag does NOT exist (RCA packaging not enabled)"
 fi
 
 # ============================================================================
 # CHECK 6: ProductSellingModel 'One Time'
 # ----------------------------------------------------------------------------
-# El SellingModel es requerido para product2 en RCA. "One Time" viene por default
-# en orgs con RCA habilitado.
+# The SellingModel is required for Product2 in RCA. "One Time" is shipped by
+# default in orgs with RCA enabled.
 # ============================================================================
 section "6. ProductSellingModel 'One Time'"
 
 PSM_JSON=$(soql "SELECT Id, Name FROM ProductSellingModel WHERE Name='One Time' AND Status='Active' LIMIT 1")
 PSM_COUNT=$(total_size "${PSM_JSON}")
 if [[ "${PSM_COUNT}" -ge 1 ]]; then
-  pass "ProductSellingModel 'One Time' existe y está activo"
+  pass "ProductSellingModel 'One Time' exists and is active"
 else
-  fail "ProductSellingModel 'One Time' NO existe/no está activo — crea uno antes de correr los siguientes scripts"
+  fail "ProductSellingModel 'One Time' does NOT exist / is not active — create one before running the next scripts"
 fi
 
 # ============================================================================
-# CHECK 7: Pricebook Standard
+# CHECK 7: Standard Pricebook
 # ----------------------------------------------------------------------------
-# Todo Product2 vinculado a Opportunity/Quote requiere PricebookEntry en el
-# Standard Pricebook. Si no está activo, los flujos fallan.
+# Every Product2 linked to an Opportunity/Quote requires a PricebookEntry on
+# the Standard Pricebook. If it is not active, the flows will fail.
 # ============================================================================
-section "7. Standard Pricebook activo"
+section "7. Standard Pricebook active"
 
 PB_JSON=$(soql "SELECT Id, Name, IsActive FROM Pricebook2 WHERE IsStandard=true LIMIT 1")
 PB_COUNT=$(total_size "${PB_JSON}")
@@ -332,71 +333,72 @@ except Exception:
 " 2>/dev/null || echo "False")
 
 if [[ "${PB_COUNT}" -ge 1 && "${PB_ACTIVE}" == "True" ]]; then
-  pass "Standard Pricebook existe y está activo"
+  pass "Standard Pricebook exists and is active"
 elif [[ "${PB_COUNT}" -ge 1 ]]; then
-  fail "Standard Pricebook existe pero NO está activo (actívalo desde Setup > Price Books)"
+  fail "Standard Pricebook exists but is NOT active (activate it from Setup > Price Books)"
 else
-  fail "Standard Pricebook NO encontrado"
+  fail "Standard Pricebook NOT found"
 fi
 
 # ============================================================================
 # CHECK 8: ProductCatalog 'Insurance Catalog'
 # ----------------------------------------------------------------------------
-# PCM requiere al menos un ProductCatalog para organizar los productos.
-# Si no existe, damos las instrucciones para crearlo (no lo creamos aquí para
-# no modificar estado sin autorización).
+# PCM requires at least one ProductCatalog to organize products. If it does
+# not exist, we print instructions to create it (we do not create it here to
+# avoid modifying state without authorization).
 # ============================================================================
 section "8. ProductCatalog 'Insurance Catalog'"
 
 CAT_JSON=$(soql "SELECT Id, Name FROM ProductCatalog WHERE Name='Insurance Catalog' LIMIT 1")
 CAT_COUNT=$(total_size "${CAT_JSON}")
 if [[ "${CAT_COUNT}" -ge 1 ]]; then
-  pass "ProductCatalog 'Insurance Catalog' existe"
+  pass "ProductCatalog 'Insurance Catalog' exists"
 else
-  warn "ProductCatalog 'Insurance Catalog' NO existe. Crear con:"
+  warn "ProductCatalog 'Insurance Catalog' does NOT exist. Create with:"
   warn "  sf data create record --sobject ProductCatalog --values \"Name='Insurance Catalog'\" --target-org ${ORG_ALIAS}"
 fi
 
 # ============================================================================
-# CHECK 9: RecordTypes de Product2 ('Commercial' y 'Coverage')
+# CHECK 9: Product2 RecordTypes ('Commercial' and 'Coverage')
 # ----------------------------------------------------------------------------
-# Los scripts que siguen crean productos con estos RecordTypes; si no existen,
-# los inserts fallan. Buscamos por DeveloperName (case-sensitive, estable).
+# The scripts that follow create products with these RecordTypes; if they do
+# not exist, the inserts fail. We look up by DeveloperName (case-sensitive
+# and stable).
 # ============================================================================
-section "9. RecordTypes de Product2"
+section "9. Product2 RecordTypes"
 
 for rt in "Commercial" "Coverage"; do
   RT_JSON=$(soql "SELECT Id FROM RecordType WHERE SobjectType='Product2' AND DeveloperName='${rt}' LIMIT 1")
   RT_COUNT=$(total_size "${RT_JSON}")
   if [[ "${RT_COUNT}" -ge 1 ]]; then
-    pass "RecordType Product2.${rt} existe"
+    pass "RecordType Product2.${rt} exists"
   else
-    fail "RecordType Product2.${rt} NO existe (créalo antes de correr los siguientes scripts)"
+    fail "RecordType Product2.${rt} does NOT exist (create it before running the next scripts)"
   fi
 done
 
 # ============================================================================
-# CHECK 10: RecordType Opportunity 'SimpleOpportunity'
+# CHECK 10: Opportunity RecordType 'SimpleOpportunity'
 # ----------------------------------------------------------------------------
-# Crítico para RCA: los quotes y flows de revenue asumen este RecordType.
-# Si no existe, la orquestación se rompe silenciosamente.
+# Critical for RCA: quotes and revenue flows assume this RecordType. If it
+# does not exist, orchestration breaks silently.
 # ============================================================================
-section "10. RecordType Opportunity 'SimpleOpportunity'"
+section "10. Opportunity RecordType 'SimpleOpportunity'"
 
 OPP_RT_JSON=$(soql "SELECT Id FROM RecordType WHERE SobjectType='Opportunity' AND DeveloperName='SimpleOpportunity' LIMIT 1")
 OPP_RT_COUNT=$(total_size "${OPP_RT_JSON}")
 if [[ "${OPP_RT_COUNT}" -ge 1 ]]; then
-  pass "RecordType Opportunity.SimpleOpportunity existe (RCA-ready)"
+  pass "RecordType Opportunity.SimpleOpportunity exists (RCA-ready)"
 else
-  fail "RecordType Opportunity.SimpleOpportunity NO existe — RCA no funcionará correctamente"
+  fail "RecordType Opportunity.SimpleOpportunity does NOT exist — RCA will not work correctly"
 fi
 
 # ============================================================================
-# Resumen final
+# Final summary
 # ============================================================================
 echo ""
 echo "${BOLD}============================================================${RESET}"
-echo "${BOLD}Resumen${RESET}"
+echo "${BOLD}Summary${RESET}"
 echo "${BOLD}============================================================${RESET}"
 echo "  ${GREEN}Passed:${RESET}   ${PASS_COUNT}"
 echo "  ${YELLOW}Warnings:${RESET} ${WARN_COUNT}"
@@ -404,15 +406,15 @@ echo "  ${RED}Failed:${RESET}   ${FAIL_COUNT}"
 
 if [[ ${FAIL_COUNT} -gt 0 ]]; then
   echo ""
-  echo "${RED}${BOLD}Checks fallidos:${RESET}"
+  echo "${RED}${BOLD}Failed checks:${RESET}"
   for f in "${FAILED_CHECKS[@]}"; do
     echo "  - ${f}"
   done
   echo ""
-  echo "${RED}${BOLD}NO CORRAS los siguientes scripts hasta resolver los fallos.${RESET}"
+  echo "${RED}${BOLD}DO NOT run the next scripts until the failures are resolved.${RESET}"
   exit 1
 fi
 
 echo ""
-echo "${GREEN}${BOLD}✓ Org lista. Puedes proceder con los siguientes scripts.${RESET}"
+echo "${GREEN}${BOLD}✓ Org ready. You can proceed with the next scripts.${RESET}"
 exit 0

@@ -1,10 +1,10 @@
-# Revenue Cloud Advanced (RCA) — Setup notes para Digital Insurance orgs
+# Revenue Cloud Advanced (RCA) — Setup notes for Digital Insurance orgs
 
-## Contexto
+## Context
 
-Este doc documenta la relación entre Digital Insurance (Insurance on Core) y Revenue Cloud Advanced (RCA), y cómo el Product Configuration LWC + Quote flow funcionan cuando ambos coexisten.
+This document covers the relationship between Digital Insurance (Insurance on Core) and Revenue Cloud Advanced (RCA), and how the Product Configuration LWC + Quote flow work when both coexist.
 
-## PSLs críticas (todas Active en Q-Branch demo orgs)
+## Critical PSLs (all Active in Q-Branch demo orgs)
 
 ### Umbrella
 - `RevenueLifecycleManagementUserPsl` — Revenue Cloud User (35 seats)
@@ -16,16 +16,16 @@ Este doc documenta la relación entre Digital Insurance (Insurance on Core) y Re
 - `CorePricingRunTime` — Salesforce Pricing Run Time (547 seats)
 - `RevLifecycleMgmtBillingPsl` — Billing
 
-### Digital Insurance específico
+### Digital Insurance specific
 - `DigitalInsuranceClaimManagementAdmin` / User
 - `DigitalInsurancePolicyAdminUserPsl` / CC / PC
 - `ClaimManagementFoundationPsl`
 - `ClaimMgmtPsl`
-- Y unas 15 más de Digital Insurance específicas
+- Plus ~15 more Digital Insurance specific ones
 
-### Permission Sets (además de las PSLs)
-- `AdvancedConfiguratorDesigner` (Product Configuration Constraints Designer) — CORE de RCA para Constraint Rules Engine
-- `ProductConfigurationRulesDesigner` — el legacy Rules Designer (BRE)
+### Permission Sets (in addition to the PSLs)
+- `AdvancedConfiguratorDesigner` (Product Configuration Constraints Designer) — CORE of RCA for the Constraint Rules Engine
+- `ProductConfigurationRulesDesigner` — the legacy Rules Designer (BRE)
 - `IndustriesConfiguratorPlatformApi` — Product Configurator
 - `ProductCatalogManagementViewer`
 - `ProductDiscoveryUser`, `ProductDiscoveryAdmin`
@@ -33,51 +33,51 @@ Este doc documenta la relación entre Digital Insurance (Insurance on Core) y Re
 - `StageManagementUser`
 - `BRERuntime` — Rule Engine Runtime
 - `OmniStudioExecution` / `OmniStudioUser`
-- 3-4 más específicas por objeto
+- 3-4 more object-specific ones
 
-**IMPORTANTE**: si un usuario System Admin no ve un sObject RCA (`SalesTransactionType`, etc.) al hacer `sf sobject describe`, NO es que el objeto no exista — es que le falta una PSL/PS crítica. Asignar todas las de arriba y volver a chequear.
+**IMPORTANT**: if a System Admin user can't see an RCA sObject (`SalesTransactionType`, etc.) when running `sf sobject describe`, it's NOT that the object doesn't exist — the user is missing a critical PSL/PS. Assign all the ones above and re-check.
 
-## sObjects que EXISTEN pero requieren permisos
+## sObjects that EXIST but require permissions
 
-- `SalesTransactionType` (0 records default — hay que crear al menos 1)
-- `SalesTransactionDefinition`, `SalesTransactionDefinitionVersion` — puede que no estén en orgs con RCA "classic", pero sí en RCA v2/Advanced
-- `ProductQuoteTemplate` — feature nueva, no en todas las orgs
-- `ProcedurePlanDefinition` (7 templates OOTB)
-- `ExpressionSetDefinition` (24 templates en orgs con Insurance completo)
+- `SalesTransactionType` (0 records by default — you have to create at least 1)
+- `SalesTransactionDefinition`, `SalesTransactionDefinitionVersion` — may not be present in "classic" RCA orgs, but they are in RCA v2/Advanced
+- `ProductQuoteTemplate` — new feature, not in all orgs
+- `ProcedurePlanDefinition` (7 OOTB templates)
+- `ExpressionSetDefinition` (24 templates in orgs with full Insurance)
 
-## Quote runtime — flow correcto
+## Quote runtime — the correct flow
 
-1. **Opportunity** con RecordType=`SimpleOpportunity`, StageName='Proposal/Quote', AccountId poblado, Pricebook2Id opcional (mejor con Standard Pricebook explícito)
-2. **OmniScript** `Insurance_CreateQuoteDCT2_English` (via Action Launcher en Account) → crea el Quote con estructura correcta
-3. **Quote** hereda TransactionType (AutoTransactionType o GroupInsuranceTransactionType) — el OmniScript lo setea
-4. **Browse Catalogs** en el Quote → picker por catalog → category → product bundle
-5. **Configure** → Product Configuration LWC (`runtime_revenue_foundation:transactionLineTable`) renderiza attributes por classification
-6. **Update Prices** → ejecuta pricing procedure
-7. **Save & Exit** → QLIs creados con ParentQuoteLineItemId estructura (parent bundle + children coverages)
-8. **Issue Policy** → wizard crea InsurancePolicy + coverages + transactions
+1. **Opportunity** with RecordType=`SimpleOpportunity`, StageName='Proposal/Quote', AccountId populated, Pricebook2Id optional (better with an explicit Standard Pricebook)
+2. **OmniScript** `Insurance_CreateQuoteDCT2_English` (via Action Launcher on the Account) → creates the Quote with the correct structure
+3. **Quote** inherits TransactionType (AutoTransactionType or GroupInsuranceTransactionType) — the OmniScript sets it
+4. **Browse Catalogs** on the Quote → picker by catalog → category → product bundle
+5. **Configure** → Product Configuration LWC (`runtime_revenue_foundation:transactionLineTable`) renders attributes by classification
+6. **Update Prices** → runs the pricing procedure
+7. **Save & Exit** → QLIs created with a ParentQuoteLineItemId structure (parent bundle + child coverages)
+8. **Issue Policy** → wizard creates InsurancePolicy + coverages + transactions
 
 ## Error "Cannot read properties null (reading 'groups')"
 
-Se dispara cuando el LWC transactionLineTable no puede resolver el "context" del Quote. Causas comunes ordenadas por probabilidad:
+Fires when the transactionLineTable LWC can't resolve the Quote "context". Common causes, ordered by likelihood:
 
-1. **Quote.TransactionType null** — setear `AutoTransactionType` o `GroupInsuranceTransactionType`
-2. **RecordType de la Opportunity no es SimpleOpportunity** — cambiar via update
-3. **Quote nunca fue saved** — según docs, requiere al menos 1 save antes de que el LWC funcione
-4. **Faltan PSLs/PS al usuario** — asignar las 30+ listadas arriba
-5. **Quote no fue creado via OmniScript sino manualmente por INSERT** — los QLIs y estructura no están completos. Recrear via OmniScript.
-6. **Producto agregado via "Add Products" clásico en vez de Browse Catalogs** — Revenue Cloud excluye Add Products del flow RCA
+1. **Quote.TransactionType null** — set `AutoTransactionType` or `GroupInsuranceTransactionType`
+2. **Opportunity RecordType is not SimpleOpportunity** — change via update
+3. **Quote was never saved** — per docs, requires at least 1 save before the LWC will work
+4. **User missing PSLs/PS** — assign the 30+ listed above
+5. **Quote was not created via OmniScript but manually via INSERT** — QLIs and structure are incomplete. Recreate via OmniScript.
+6. **Product added via classic "Add Products" instead of Browse Catalogs** — Revenue Cloud excludes Add Products from the RCA flow
 
-## Setup checklist para nueva org
+## Setup checklist for a new org
 
 1. Enable Revenue Cloud Features (Setup > Revenue Settings)
 2. Enable Salesforce Pricing (Setup > Salesforce Pricing Settings)
 3. Configure Products at Runtime = ON
-4. Transaction processing for quotes = ON, con Transaction Processing Type default
-5. Clonar y activar un Pricing Procedure (Expression Set Templates)
-6. Setear PricingRecipe.DefaultPricingProcedureId
-7. Correr Sync Pricing Data
-8. Crear al menos 1 SalesTransactionType linkeado al Pricing Procedure
-9. Configurar FlexiPage Quote con LWC `runtime_revenue_foundation:transactionLineTable` + `transactionSummary` + `progressIndicator`
-10. Asignar ProductConfigurationFlow a los productos bundle configurables (via ProductConfigFlowAssignment)
-11. Asignar TODAS las PSLs y PS al usuario demo
-12. Verificar Quote Line Group page layout asignado al perfil del usuario (Known Issue Spring '26)
+4. Transaction processing for quotes = ON, with a default Transaction Processing Type
+5. Clone and activate a Pricing Procedure (Expression Set Templates)
+6. Set PricingRecipe.DefaultPricingProcedureId
+7. Run Sync Pricing Data
+8. Create at least 1 SalesTransactionType linked to the Pricing Procedure
+9. Configure the Quote FlexiPage with LWCs `runtime_revenue_foundation:transactionLineTable` + `transactionSummary` + `progressIndicator`
+10. Assign ProductConfigurationFlow to the configurable bundle products (via ProductConfigFlowAssignment)
+11. Assign ALL the PSLs and PS to the demo user
+12. Verify the Quote Line Group page layout is assigned to the user's profile (Known Issue Spring '26)

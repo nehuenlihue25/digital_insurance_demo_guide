@@ -1,18 +1,18 @@
 # Reference IDs — org ins-qbranch-alfa
 
-> ADVERTENCIA: Estos IDs son de la org ins-qbranch-alfa (org 00Dg8000009T1MvEAK) capturados 2026-07-08. VAN A CAMBIAR en cualquier otra org. Los scripts de replicacion resuelven los IDs dinamicamente via Name/Code — este archivo es SOLO para debugging/verificacion, no para copiar en scripts.
+> WARNING: These IDs are from the ins-qbranch-alfa org (org 00Dg8000009T1MvEAK) captured 2026-07-08. They WILL CHANGE in any other org. The replication scripts resolve IDs dynamically via Name/Code — this file is ONLY for debugging/verification, not for copying into scripts.
 
 ## Org
 
-| Item | Valor |
+| Item | Value |
 |---|---|
 | Org Id | 00Dg8000009T1MvEAK |
 | Instance URL | https://storm-c90aab66569c63.my.salesforce.com |
-| Username demo | storm.c90aab66569c63@salesforce.com |
+| Demo username | storm.c90aab66569c63@salesforce.com |
 | Alias | ins-qbranch-alfa |
 | Nehuen Lobo (User Id) | 005g80000053bWPAAY |
 
-## Bloque 1 — Productos + Attributes + Classifications
+## Block 1 — Products + Attributes + Classifications
 
 ### Product2
 | Name | Code | Id | ProductClass (auto) |
@@ -75,7 +75,7 @@
 |---|---|---|
 | Seguros Pyme | pymeIntegral | 0ZGg8000000FLP7GAO |
 
-## Bloque 2 — Accounts + Opportunity + Policy
+## Block 2 — Accounts + Opportunity + Policy
 
 ### Accounts
 | Name | Id |
@@ -100,12 +100,12 @@
 |---|---|---|
 | POL-PYME-2026-0001 | In Force | 0YTg80000000hJVGAY |
 
-### Quote (asset RCA construido)
+### Quote (RCA-built asset)
 | Name | Id | Notes |
 |---|---|---|
-| COT-PYME-2026-0001-Panaderia | 0Q0g80000013EQrCAM | Rename de "Rachel Adams Auto Quote"; TransactionType=AutoTransactionType. AccountId sigue apuntando a Rachel (no writable post-create) pero la estructura de QLIs es Plan Empresarial |
+| COT-PYME-2026-0001-Panaderia | 0Q0g80000013EQrCAM | Renamed from "Rachel Adams Auto Quote"; TransactionType=AutoTransactionType. AccountId still points to Rachel (not writable post-create) but the QLI structure is Plan Empresarial |
 
-## Bloque 5 — InsuranceClauses
+## Block 5 — InsuranceClauses
 
 | Name | Code | Type | Id |
 |---|---|---|---|
@@ -116,7 +116,7 @@
 | Exclusion Actividades Extremas | actividadesExt | Exclusion | 1T5g800000000HlCAI |
 | Clausula de Deducible Minimo | deducibleMinPyme | Clause | 1T5g800000000JNCAY |
 
-## Bloque 3 — Claim + hijos
+## Block 3 — Claim + children
 
 ### Claim
 | Name | Id |
@@ -141,7 +141,7 @@
 | CCPD-02 Lucro Cesante Pendiente Autoridad | Expense | Pending Authority | 8,000,000 | 0l2g80000000PhZAAU |
 | CCPD-03 Estanteria Pagada | Loss | Paid | 8,000,000 | 0l2g80000000Q2XAAU |
 
-## Bloque 6 — Reports + Dashboards
+## Block 6 — Reports + Dashboards
 
 ### Folder
 | Name | Type | Id |
@@ -157,7 +157,7 @@
 - ClaimCovReserveAdjustment_Pyme__c
 
 ### Reports (11)
-Los API names son `Cartera_Pyme_por_Industry`, `Coberturas_Activas_por_Tipo_Pyme`, `Loss_Ratio_Pyme`, `Pagos_Aprobados_vs_Pendientes_Pyme`, `Polizas_por_Status_Pyme`, `Polizas_Proximas_a_Vencer_Pyme`, `Prima_Emitida_por_Plan_Pyme`, `Prima_Emitida_por_Producto_Pyme`, `Reserva_Total_Pyme`, `Siniestros_por_Estado_Pyme`, `Total_Prima_Emitida_Pyme`. Todos en folder Seguros_ALFA_Pyme.
+The API names are `Cartera_Pyme_por_Industry`, `Coberturas_Activas_por_Tipo_Pyme`, `Loss_Ratio_Pyme`, `Pagos_Aprobados_vs_Pendientes_Pyme`, `Polizas_por_Status_Pyme`, `Polizas_Proximas_a_Vencer_Pyme`, `Prima_Emitida_por_Plan_Pyme`, `Prima_Emitida_por_Producto_Pyme`, `Reserva_Total_Pyme`, `Siniestros_por_Estado_Pyme`, `Total_Prima_Emitida_Pyme`. All in the Seguros_ALFA_Pyme folder.
 
 ### Dashboards (3)
 - Tablero_Siniestralidad_Pyme_2026

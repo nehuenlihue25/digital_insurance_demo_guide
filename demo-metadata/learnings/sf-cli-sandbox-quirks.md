@@ -1,50 +1,50 @@
-# sf CLI en Sandbox Environment (Claude Code) — Quirks
+# sf CLI in a Sandbox Environment (Claude Code) — Quirks
 
-Este documento es específico para SEs/devs que usan Claude Code con sandbox restrictions habilitadas (denyWithinAllow sobre `~/.sfdx/` y `~/.sf/`).
+This document is specifically for SEs/devs using Claude Code with sandbox restrictions enabled (denyWithinAllow over `~/.sfdx/` and `~/.sf/`).
 
-## Quirk 1: SF_DISABLE_LOG_FILE=true es obligatorio
+## Quirk 1: SF_DISABLE_LOG_FILE=true is mandatory
 
-Sin este env var, sf CLI tira EPERM al intentar crear el log file en `~/.sf/sf-YYYY-MM-DD.log`. Prefijo cada invocación:
+Without this env var, sf CLI throws EPERM when trying to create the log file at `~/.sf/sf-YYYY-MM-DD.log`. Prefix every invocation:
 ```bash
 export SF_DISABLE_LOG_FILE=true
 sf data query --target-org $ORG --query "..."
 ```
 
-O poner en `.envrc` / bashrc del proyecto.
+Or set it in the project's `.envrc` / bashrc.
 
-## Quirk 2: sf project deploy start NO funciona
+## Quirk 2: sf project deploy start DOES NOT work
 
-Bloquea con `EPERM: operation not permitted, mkdir '/Users/nlobo/.sfdx/<username>.json.lock'`. Sandbox denyWithinAllow bloquea escrituras en `~/.sfdx/`.
+Blocks with `EPERM: operation not permitted, mkdir '/Users/nlobo/.sfdx/<username>.json.lock'`. Sandbox denyWithinAllow blocks writes to `~/.sfdx/`.
 
-**Workaround**: deploy via SOAP Metadata API directo con curl:
+**Workaround**: deploy directly via SOAP Metadata API with curl:
 1. Get accessToken via `sf org display --json --verbose`
-2. Zip el package
+2. Zip the package
 3. Base64 encode
-4. Wrap en SOAP envelope
-5. POST a `{instance}/services/Soap/m/62.0` con SOAPAction: deploy
-6. Poll checkDeployStatus con asyncId
+4. Wrap in a SOAP envelope
+5. POST to `{instance}/services/Soap/m/62.0` with SOAPAction: deploy
+6. Poll checkDeployStatus with asyncId
 
-Ver `../scripts/05-bloque6-deploy-reports.sh` para implementación completa.
+See `../scripts/05-block6-deploy-reports.sh` for the full implementation.
 
-## Quirk 3: DomainNotFoundError intermitente
+## Quirk 3: Intermittent DomainNotFoundError
 
-Después de idle >30 min, sf CLI empieza a devolver `DomainNotFoundError` para todos los orgs. El fix es:
+After >30 min idle, sf CLI starts returning `DomainNotFoundError` for all orgs. The fix is:
 ```bash
 export SFDX_DISABLE_DNS_CHECK=true
 ```
 
 ## Quirk 4: Session expired mid-flow
 
-Si Claude Code sesión + sandbox toma >30 min de idle, el access token cachedo expira. `sf CLI` intenta refresh que falla por `~/.sfdx/` write block. Fix: hacer `sf org login web` MANUALMENTE fuera del sandbox (en otra terminal), reingresar Claude Code.
+If the Claude Code session + sandbox goes >30 min idle, the cached access token expires. `sf CLI` attempts a refresh which fails due to the `~/.sfdx/` write block. Fix: run `sf org login web` MANUALLY outside the sandbox (in another terminal), then re-enter Claude Code.
 
 ## Quirk 5: --json output structure
 
-Algunos outputs son `{result: {...}}`, otros son array directo `[...]`. Ejemplos:
+Some outputs are `{result: {...}}`, others are a direct array `[...]`. Examples:
 - `sf org display --json`: `{result: {accessToken, instanceUrl, ...}}`
 - `sf data query --json`: `{result: {records: [...], done: true, ...}}`
-- Tooling API vía curl directo: puede ser array de errores `[{message, errorCode}]` o `{records: [...]}`
+- Tooling API via direct curl: can be an error array `[{message, errorCode}]` or `{records: [...]}`
 
-Siempre parse con python defensive:
+Always parse defensively with python:
 ```python
 d = json.load(sys.stdin)
 if isinstance(d, list): # error array or direct list
@@ -55,7 +55,7 @@ elif isinstance(d, dict):
 
 ## Quirk 6: sf data query --result-format csv tail parsing
 
-`sf data query ... --result-format csv | tail -1` es idiomático para agarrar 1 valor. Pero cuando hay 0 records, tail devuelve el header o vacío. Verificar con:
+`sf data query ... --result-format csv | tail -1` is idiomatic for grabbing 1 value. But when there are 0 records, tail returns the header or empty. Verify with:
 ```bash
 if [ -z "$VAR" ] || [ "$VAR" = "Id" ]; then
   echo "No results found"; exit 1
@@ -64,26 +64,26 @@ fi
 
 ## Quirk 7: COUNT() queries via grep
 
-`sf data query "SELECT COUNT() FROM X"` no devuelve una tabla con column "COUNT" — devuelve el message "Total number of records retrieved: N". Parsear con:
+`sf data query "SELECT COUNT() FROM X"` does not return a table with a "COUNT" column — it returns the message "Total number of records retrieved: N". Parse with:
 ```bash
 COUNT=$(sf data query ... | grep -oE 'retrieved: [0-9]+' | tail -1 | grep -oE '[0-9]+')
 ```
 
-## Quirk 8: Field aliases en SOQL
+## Quirk 8: Field aliases in SOQL
 
-Salesforce SOQL solo permite aliases en aggregate queries. `SELECT Id, Name coverage FROM X` falla con "only aggregate expressions use field aliasing". Solución: usar los nombres reales de fields o subselects.
+Salesforce SOQL only allows aliases in aggregate queries. `SELECT Id, Name coverage FROM X` fails with "only aggregate expressions use field aliasing". Fix: use the real field names or subselects.
 
 ## Quirk 9: sf CLI --api-version 63.0
 
-Para ver fields RCA en Quote/QuoteLineItem (SegmentIdentifier, RevenueCloudPackagingFlag, etc.), forzar API version alta:
+To see RCA fields on Quote/QuoteLineItem (SegmentIdentifier, RevenueCloudPackagingFlag, etc.), force a high API version:
 ```bash
 sf data query --api-version 63.0 --query "SELECT SegmentIdentifier FROM QuoteLineItem"
 ```
-Sin esto, API v50 default esconde los fields.
+Without this, the default v50 API hides the fields.
 
-## Quirk 10: Bash heredocs con vars
+## Quirk 10: Bash heredocs with vars
 
-Al escribir SOAP envelopes con $TOKEN, $INST inline, usar heredoc regular (no <<'EOF'):
+When writing SOAP envelopes with inline $TOKEN, $INST, use a regular heredoc (not <<'EOF'):
 ```bash
 cat > /tmp/soap.xml <<EOF
 <sessionId>$TOKEN</sessionId>

@@ -1,43 +1,43 @@
 # Narrative Fallbacks — Seguros ALFA Demo
 
-Talk tracks pre-armados para situaciones específicas durante la demo del 2026-07-09.
+Pre-built talk tracks for specific situations that may come up during the 2026-07-09 demo. *(Sample scripts — deliver in the client's language.)*
 
-## Talk track: "Los precios aparecen en USD, no COP"
+## Talk track: "Prices show in USD, not COP"
 
-> "El símbolo $ que aparece en pantalla es porque esta org demo tiene default currency USD — es un artefacto técnico del ambiente. Los valores numéricos que ven (2,400,000, 800,000, etc.) son los que ALFA configuraría en pesos colombianos al parametrizar la moneda de su org productiva. Todo el pricing procedure y las matrices tarifarias funcionan idénticamente sin importar la moneda."
+> "The $ symbol on screen appears because this demo org has USD set as the default currency — it's a technical artifact of the environment. The numeric values you see (2,400,000, 800,000, etc.) are what ALFA would configure in Colombian pesos when setting the currency on their production org. The entire pricing procedure and rate matrices work identically regardless of the currency."
 
-## Talk track: "Los labels standard están en inglés"
+## Talk track: "Standard labels are in English"
 
-> "El locale del usuario demo está en en_US por eso las etiquetas de Salesforce estándar (Product Code, Save & Exit, Related, etc.) salen en inglés. En la implementación real de ALFA, el usuario se configura con locale es_CO y toda la interfaz aparece traducida al español automáticamente. Todos los datos de negocio que ven en pantalla (nombres de productos, coverages, atributos, cláusulas, siniestros) están en español porque los cargamos así en el catálogo — que es lo que importa."
+> "The demo user's locale is set to en_US, which is why standard Salesforce labels (Product Code, Save & Exit, Related, etc.) appear in English. In ALFA's real implementation, the user is configured with locale es_CO and the entire interface is automatically translated to Spanish. All the business data you see on screen (product names, coverages, attributes, clauses, claims) is in Spanish because that's how we loaded it into the catalog — which is what matters."
 
-## Talk track: "No veo Reaseguros ni Facturación en la demo"
+## Talk track: "I don't see Reinsurance or Billing in the demo"
 
-> "Correcto, están fuera del alcance de esta sustentación por dos razones. Reaseguros es una capa que se integra con soluciones especializadas — el modelo de datos de Insurance on Core no incluye reaseguros nativamente porque es un mercado donde las aseguradoras usan sistemas dedicados (Guy Carpenter, Cognalys, SICS). Facturación y recaudo, similar — se integra con la solución de billing que ALFA ya tenga en producción. Ambos son puntos claros en la arquitectura y los detallamos en la sesión de arquitectura al final."
+> "Correct — they're outside the scope of this presentation for two reasons. Reinsurance is a layer that integrates with specialized solutions — the Insurance on Core data model does not include reinsurance natively because it's a market where insurers rely on dedicated systems (Guy Carpenter, Cognalys, SICS). Billing and collections, similarly, integrate with the billing solution ALFA already has in production. Both are clear points on the architecture diagram, and we'll cover them in detail during the architecture session at the end."
 
-## Talk track: "No veo Rules configurados sobre el Plan Empresarial"
+## Talk track: "I don't see any Rules configured on Plan Empresarial"
 
-> "Correcto — mostramos el motor de Rules disponible y los 6 UnderwritingRuleGroups OOTB para ilustrar la capacidad. En una implementación real de ALFA, el equipo de suscripción configura las reglas específicas (validación de actividad económica, límites de suma asegurada por segmento, reglas de aprobación por monto) sobre este mismo motor. Configurar 20-30 reglas típicas toma 2-3 semanas del equipo de negocio con acompañamiento del arquitecto — ya está incluido en el roadmap de implementación."
+> "Correct — we're showing the Rules engine that ships out of the box along with the 6 OOTB UnderwritingRuleGroups to illustrate the capability. In an actual ALFA implementation, the underwriting team configures the specific rules (economic activity validation, sum-insured limits per segment, approval rules by amount) on this same engine. Configuring 20-30 typical rules takes the business team about 2-3 weeks with architect support — it's already included in the implementation roadmap."
 
-## Talk track: "Los dashboards se ven simples / pobres"
+## Talk track: "The dashboards look basic / thin"
 
-> "Los dashboards que están viendo son tabulares básicos porque ilustran los datos disponibles al modelo de reportería. En la implementación de ALFA se combinan con **CRM Analytics** — que también está en las licencias de esta org — para agregación temporal, drill-down por sucursal/producto, alertas de KPI y forecasting. En la sesión de arquitectura mostramos el paso de estos reports estándar a dashboards CRM Analytics con Einstein Discovery."
+> "The dashboards you're seeing are basic tabular reports because they illustrate the data available to the reporting model. In ALFA's implementation, they combine with **CRM Analytics** — which is also part of this org's licenses — for temporal aggregation, drill-down by branch/product, KPI alerts and forecasting. In the architecture session we show how these standard reports transition to CRM Analytics dashboards with Einstein Discovery."
 
-## Talk track: "Falta configuración de tarifas dinámicas"
+## Talk track: "There's no dynamic rating configuration"
 
-> "Lo que mostramos hoy es el pricing procedure OOTB — Insurance_Quote_Default_Pricing_Procedure. Digital Insurance PCM soporta pricing procedures avanzadas via 3 capas declarativas: (1) CalculationMatrix para rate cards por segmento/región/actividad, (2) ExpressionSet para lógica condicional, (3) DecisionTable para tablas de coeficientes. Todas se configuran sin código. Un actuario de ALFA con capacitación PCM (~1 semana) puede modelar cualquier tarifa comercial de su portfolio."
+> "What we're showing today is the OOTB pricing procedure — Insurance_Quote_Default_Pricing_Procedure. Digital Insurance PCM supports advanced pricing procedures via 3 declarative layers: (1) CalculationMatrix for rate cards by segment/region/activity, (2) ExpressionSet for conditional logic, (3) DecisionTable for coefficient tables. All of them are configured without code. An ALFA actuary with PCM training (~1 week) can model any commercial rate in their portfolio."
 
-## Talk track: "Puedo modificar precios en línea?"
+## Talk track: "Can I modify prices inline?"
 
-> "Sí. Cada Coverage tiene su UnitPrice en el PricebookEntry — modificable declarativamente. Además, el pricing procedure calcula el precio final en tiempo real basado en los atributos que el agente configura (Suma Asegurada, Actividad Económica, etc.). Un cambio de precio a nivel producto o de la fórmula se propaga instantáneamente a todas las cotizaciones futuras. Las pólizas ya emitidas mantienen su precio contractual hasta renovación."
+> "Yes. Each Coverage has its UnitPrice on the PricebookEntry — modifiable declaratively. In addition, the pricing procedure calculates the final price in real time based on the attributes the agent configures (Suma Asegurada, Actividad Económica, etc.). A price change at the product level or in the formula propagates instantly to all future quotes. Already-issued policies keep their contractual price until renewal."
 
-## Talk track: "Cómo se integra con nuestros sistemas legacy?"
+## Talk track: "How does this integrate with our legacy systems?"
 
-> "Insurance on Core expone APIs REST y SOAP estándar sobre todos los objetos: Product2, InsurancePolicy, Claim, ClaimCoverage, InsurancePolicyTransaction. Además, hay endpoints específicos de Digital Insurance (Insurance Rating API, Endorsement API, Claims Management API) para integraciones de mayor volumen. Para ETL batch con AS400 o Core externo, se usa MuleSoft o Data Loader según volumen. En la sesión de arquitectura detallamos el modelo de integración específico para el paisaje IT de ALFA."
+> "Insurance on Core exposes standard REST and SOAP APIs over every object: Product2, InsurancePolicy, Claim, ClaimCoverage, InsurancePolicyTransaction. On top of that, there are Digital Insurance-specific endpoints (Insurance Rating API, Endorsement API, Claims Management API) for higher-volume integrations. For batch ETL against AS400 or an external core, we use MuleSoft or Data Loader depending on volume. In the architecture session we detail the integration model specific to ALFA's IT landscape."
 
-## Talk track: "El siniestro se ve simplificado. En ALFA gestionamos 20-30 pasos"
+## Talk track: "The claim view looks simplified. At ALFA we manage 20-30 steps"
 
-> "Correcto — mostramos el ciclo end-to-end con 6 fases (FNOL, participants, items, coverage, reservas, pagos) para dar contexto. En la implementación real de ALFA se modela el workflow completo con Action Plans, milestones, SLAs, aprobaciones multi-nivel y notificaciones. El motor de Action Plan que ven vacío en esta demo es donde se configuran esos 20-30 pasos. Un caso de siniestro típico de ALFA se puede modelar en 2-3 días de configuración."
+> "Correct — we're showing the end-to-end cycle with 6 phases (FNOL, participants, items, coverage, reserves, payments) to give context. In ALFA's real implementation, the full workflow is modeled with Action Plans, milestones, SLAs, multi-level approvals and notifications. The Action Plan engine you see empty in this demo is where those 20-30 steps get configured. A typical ALFA claim case can be modeled in 2-3 days of configuration."
 
-## Talk track: "Este catálogo lo puede administrar el equipo de negocio?"
+## Talk track: "Can the business team administer this catalog?"
 
-> "Sí, es una promesa central del módulo. Un rol de negocio con permisos sobre Product Catalog Management (PSL DigitalInsuranceProductAdmin) puede: crear nuevos productos, agregar/quitar coverages, modificar atributos y sus rangos, cambiar precios, activar/desactivar productos por fecha, publicar a catálogos y categorías, definir reglas de suscripción. Todo sin tocar código, sin depender de IT. El equipo de arquitectura mantiene los cimientos (ProductClassification, AttributeDefinition genéricas), el equipo comercial arma sus productos comerciales sobre eso."
+> "Yes — it's a core promise of the module. A business role with Product Catalog Management permissions (PSL DigitalInsuranceProductAdmin) can: create new products, add/remove coverages, modify attributes and their ranges, change prices, activate/deactivate products by date, publish to catalogs and categories, and define underwriting rules. All without touching code, without depending on IT. The architecture team maintains the foundations (ProductClassification, generic AttributeDefinitions); the commercial team builds their commercial products on top of that."

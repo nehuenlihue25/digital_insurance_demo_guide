@@ -1,58 +1,112 @@
 # Digital Insurance (Insurance on Core) — Demo Guide
 
-> Guía completa para armar, ejecutar y replicar una demo end-to-end de **Salesforce Insurance on Core / Digital Insurance** para el ramo Pyme (SME commercial insurance). Construida sobre el caso real del RFP de Seguros ALFA (Grupo Aval, Colombia) con Claude Code como copiloto.
+> End-to-end reference for building, running, and replicating a **Salesforce Insurance on Core / Digital Insurance** demo for the SME (Pyme) commercial line. Built from a real RFP engagement — Seguros ALFA (Grupo Aval, Colombia) — with Claude Code as the copilot.
 
-## Qué encontrás acá
+This repo is designed to be **forked and adapted**. The concrete demo values (Seguros ALFA as the carrier, Grupo Aval as the parent group, Panadería La Espiga as the SME account) are placeholders — swap them for your own client.
 
-- **[PLAN_SEGUROS_ALFA_2026-07-09.md](PLAN_SEGUROS_ALFA_2026-07-09.md)** — plan maestro del proyecto: contexto, decisiones lockeadas, cronograma, verificación de la org
-- **[SPEC_PYME_INTEGRAL_BLOQUE1.md](SPEC_PYME_INTEGRAL_BLOQUE1.md)** — spec técnica del producto Pyme (bundle + coverages + attributes + classifications), con teardown de Auto Gold como referencia
-- **[INDICE_RUNBOOKS.md](INDICE_RUNBOOKS.md)** — pre-demo checklist maestro + agenda del día + guía Q&A
-- **[RUNBOOK_BLOQUE1_PRODUCTO_PYME.md](RUNBOOK_BLOQUE1_PRODUCTO_PYME.md)** — Bloque 1 (48 min): Product Catalog Management + Quote configuration LWC + Issue Policy — click-by-click con talk track literal
-- **[RUNBOOK_BLOQUE2_CICLO_POLIZA.md](RUNBOOK_BLOQUE2_CICLO_POLIZA.md)** — Bloque 2 (30 min): ciclo póliza, endoso, cláusulas
-- **[RUNBOOK_BLOQUE3_SINIESTROS.md](RUNBOOK_BLOQUE3_SINIESTROS.md)** — Bloque 3 (45 min): siniestros end-to-end con reservas y pagos
-- **[RUNBOOK_BLOQUE6_REPORTERIA.md](RUNBOOK_BLOQUE6_REPORTERIA.md)** — Bloque 6 (30 min): 3 dashboards + 11 reports en español
-- **[demo-metadata/](demo-metadata/)** — replicación automática:
-  - `scripts/` — 6 scripts sh que recrean toda la data en cualquier Digital Insurance org (~5-10 min)
-  - `metadata/` — MDAPI packages listos para deploy (5 CRTs + 3 dashboards + 11 reports)
-  - `learnings/` — 13 gotchas técnicos + 10 quirks del sf CLI en sandbox + setup RCA/RLM + 10 talk tracks para preguntas incómodas + 10 lecciones para el próximo Claude Code
-  - `reference-ids.md` — tabla de referencia (con advertencia: no hardcodear)
+## What's in this repo
 
-## Replicar la demo en tu org
+### Operational documents (root)
 
-Prerequisitos:
-- Org con **Digital Insurance + Revenue Cloud Advanced** habilitados
-- `sf` CLI autenticado con el alias de tu org
-- User con las PSLs Digital Insurance + RCA (ver `demo-metadata/learnings/rca-rlm-setup.md`)
+- **[PROJECT_PLAN_ALFA_2026-07-09.md](PROJECT_PLAN_ALFA_2026-07-09.md)** — master project plan: context, locked decisions, timeline, org audit
+- **[SPEC_PYME_INTEGRAL_BLOCK1.md](SPEC_PYME_INTEGRAL_BLOCK1.md)** — technical spec for the Pyme product (bundle + coverages + attributes + classifications), with a teardown of Auto Gold as the reference implementation
+- **[RUNBOOKS_INDEX.md](RUNBOOKS_INDEX.md)** — master pre-demo checklist + day-of agenda + Q&A guide
+- **[RUNBOOK_BLOCK1_PYME_PRODUCT.md](RUNBOOK_BLOCK1_PYME_PRODUCT.md)** — Block 1 (48 min): Product Catalog Management + Quote configuration LWC + Issue Policy — click-by-click with literal talk track
+- **[RUNBOOK_BLOCK2_POLICY_LIFECYCLE.md](RUNBOOK_BLOCK2_POLICY_LIFECYCLE.md)** — Block 2 (30 min): policy lifecycle, endorsement, clauses
+- **[RUNBOOK_BLOCK3_CLAIMS.md](RUNBOOK_BLOCK3_CLAIMS.md)** — Block 3 (45 min): end-to-end claims with reserves and payments
+- **[RUNBOOK_BLOCK6_REPORTING.md](RUNBOOK_BLOCK6_REPORTING.md)** — Block 6 (30 min): 3 dashboards + 11 Spanish-labeled reports
+
+### Automation and knowledge (`demo-metadata/`)
+
+- `scripts/` — 6 shell scripts that recreate the entire demo dataset in any Digital Insurance org in ~5–10 minutes
+- `metadata/` — MDAPI packages ready to deploy (5 Custom Report Types + 3 dashboards + 11 reports)
+- `learnings/` — 13 technical gotchas, 10 sf CLI quirks in sandbox, RCA/RLM setup guide, 10 talk tracks for uncomfortable questions, 10 meta-lessons for the next Claude Code session
+- `reference-ids.md` — snapshot of the current IDs (reference only; scripts must resolve IDs dynamically)
+
+## Quick start — Replicate the demo in your org
+
+Prerequisites:
+- Org with **Digital Insurance + Revenue Cloud Advanced (RCA)** enabled
+- `sf` CLI authenticated with an alias for your org
+- User with the Digital Insurance + RCA Permission Set Licenses (see `demo-metadata/learnings/rca-rlm-setup.md`)
 
 ```bash
-export ORG=<alias-de-tu-org>
+export ORG=<your-org-alias>
 cd demo-metadata/
-./scripts/00-prerequisites.sh $ORG    # verifica setup
-./scripts/01-bloque1-product.sh $ORG  # bundle Pyme Integral + 6 coverages + 48 PADs
-./scripts/02-bloque5-clauses.sh $ORG  # 6 InsuranceClauses en español + variableMaps
-./scripts/03-bloque2-policy.sh $ORG   # Accounts + POL-PYME + coverages + transactions
-./scripts/04-bloque3-claim.sh $ORG    # SIN-PYME + participants + items + reserves + payments
-./scripts/05-bloque6-deploy-reports.sh $ORG  # deploy reports+dashboards via SOAP MDAPI
+./scripts/00-prerequisites.sh $ORG              # verify PSL/PS + connectivity
+./scripts/01-block1-product.sh $ORG             # Pyme Integral bundle + 6 coverages + 48 PADs
+./scripts/02-block5-clauses.sh $ORG             # 6 Spanish InsuranceClauses + variableMaps
+./scripts/03-block2-policy.sh $ORG              # Accounts + POL-PYME + coverages + transactions
+./scripts/04-block3-claim.sh $ORG               # SIN-PYME + participants + items + reserves + payments
+./scripts/05-block6-deploy-reports.sh $ORG      # deploy reports + dashboards via SOAP MDAPI
 ```
 
-Los scripts son idempotentes, usan lookups dinámicos (nada de IDs hardcodeados) y prefijan `SF_DISABLE_LOG_FILE=true`.
+Every script is idempotent, resolves IDs dynamically (never hardcoded), and prefixes `SF_DISABLE_LOG_FILE=true` so `sf` behaves in restricted shells.
 
-Los pasos que **requieren UI** (OmniScript CreateQuoteDCT2, Product Configuration LWC, Issue Policy wizard) están documentados en el runbook Bloque 1 — no son automatizables.
+Steps that **require the UI** (OmniScript `CreateQuoteDCT2`, Product Configuration LWC, Issue Policy wizard) are documented in the Block 1 runbook — they cannot be automated today.
 
-## Los 5 gotchas más críticos (spoilers)
+## Using this repo with Claude Code
 
-1. **`Product2.ProductClass` no es writable** — autoderivado de RecordType/Type
-2. **`ProductRelatedComponent.Parent/ChildProductRole`** autoderivados de RelationshipType
-3. **PADs NO se autogeneran** con `BasedOnId` — hay que crearlos manualmente (6 coverages × 8 attrs = 48 records)
-4. **`InsuranceClause.Type`** (no `ClauseType` como muchos docs dicen)
-5. **RCA Quote requiere `TransactionType`** poblado + Opportunity con RecordType `SimpleOpportunity` — sin eso el Product Configuration LWC lanza `Cannot read properties null (reading 'groups')`
+This repo was built with [Claude Code](https://claude.com/product/claude-code) as a pair-programming partner over a Digital Insurance org, and it is designed to be re-used the same way. If you have Claude Code installed:
 
-Los 13 gotchas completos: [`demo-metadata/learnings/digital-insurance-gotchas.md`](demo-metadata/learnings/digital-insurance-gotchas.md)
+1. Fork or clone this repo.
+2. Open a terminal in the repo root and run `claude` to launch Claude Code inside it.
+3. Enable **ultracode** mode (`/ultracode` toggle) for the multi-step build work — the runbooks and scripts assume a thorough execution style.
+4. Point Claude at whichever runbook or script you need. Claude reads the runbook and drives your org via the `sf` CLI and MCP tools.
 
-## Créditos
+### Example prompts
 
-Construido con [Claude Code](https://claude.com/product/claude-code) por Nehuen Lobo (@nehuenlihue25) para el proyecto Seguros ALFA (Grupo Aval, Colombia) — sustentación RFP 2026-07-09.
+Copy any of these into Claude Code, adapt the bracketed bits, and hit enter:
 
-## Licencia
+- `Read this repo. Adapt the Block 1 runbook for a new client called [X] in the [Y] region — replace the Seguros ALFA references, keep the Pyme product structure. Do not translate the coverage names.`
+- `Read demo-metadata/scripts/. Rewrite the scripts to build a similar product for [my LOB — Auto, Life, Health]. Preserve the pattern of catalog + coverages + attributes + PADs + clauses.`
+- `Read demo-metadata/learnings/. Suggest 3 improvements to my current Digital Insurance demo based on the gotchas here.`
+- `I'm getting error "Cannot read properties null (reading 'groups')" when opening a Quote — search demo-metadata/learnings/rca-rlm-setup.md for the diagnosis and give me a fix checklist.`
+- `Extend the demo with a Block 7 for [feature X]. Follow the runbook template used by RUNBOOK_BLOCK6_REPORTING.md.`
 
-MIT (por definir según preferencia del owner)
+### Memory and continuity
+
+Claude Code's **memory system** persists project context between sessions. As you work, Claude accumulates notes under `~/.claude/projects/<sanitized-path>/memory/` (auto-memory) that survive across restarts and get replayed at the start of the next session over the same repo. Use `/remember ...` or an explicit "save this as memory" instruction to pin a specific learning (a fixed gotcha, an org ID convention, a preferred agenda) so future sessions inherit it.
+
+For meta-lessons on how the original build with Claude went — what worked, what to avoid — read [`demo-metadata/learnings/claude-code-lessons.md`](demo-metadata/learnings/claude-code-lessons.md) before your first serious session.
+
+### Recommended workflow
+
+1. Start Claude with the **README + `demo-metadata/reference-ids.md`** as its initial context.
+2. Ask Claude to read the **specific runbook** for the block you're working on (don't front-load all four — the runbooks are long).
+3. Delegate the build steps to Claude with **ultracode enabled**, letting it drive `sf` CLI, MDAPI deploys, and REST inserts.
+4. **Verify each block in the org UI** before moving to the next one. The runbooks list the exact tab / record / attribute to eyeball.
+
+## The 5 most critical gotchas (spoilers)
+
+1. **`Product2.ProductClass` is not writable** — it is auto-derived from `RecordType` (Coverage → Simple) or `Type` (Bundle → Bundle). Do not include it in the INSERT payload.
+2. **`ProductRelatedComponent.ParentProductRole` / `ChildProductRole`** are auto-derived from `ProductRelationshipTypeId`. Same rule — don't include them.
+3. **PADs are NOT auto-generated** with `BasedOnId` — you must create `ProductAttributeDefinition` records manually, one per (Product2 × ProductClassificationAttr). Six coverages × eight attributes = 48 records.
+4. **`InsuranceClause.Type`** (not `ClauseType`, which many docs incorrectly show) — this catches almost everyone.
+5. **RCA Quote requires `TransactionType` populated** + an Opportunity with `SimpleOpportunity` RecordType. Without both, the Product Configuration LWC throws `Cannot read properties null (reading 'groups')`.
+
+Full list of 13 gotchas: [`demo-metadata/learnings/digital-insurance-gotchas.md`](demo-metadata/learnings/digital-insurance-gotchas.md).
+
+## Case study context
+
+The concrete names in this repo are the values from the original engagement:
+
+- **Seguros ALFA** — the carrier (insurance company running the demo)
+- **Grupo Aval** — the parent financial group in Colombia
+- **Panadería La Espiga** — the SME account used across the policy and claim narrative
+- **POL-PYME-2026-0001 / SIN-PYME-2026-0001** — demo policy and claim numbers
+- **Colombia / COP** — geography and currency; amounts are labeled in Colombian Peso for narrative purposes
+
+Adapt these to your own client. The runbooks call out where the names appear in talk tracks so you can substitute cleanly. Coverage names (Incendio, Terremoto, Sustracción, RC, Responsabilidad Civil Servidor Público, Lucro Cesante) are left in Spanish on purpose — they map to how the Colombian SME market talks about coverages, and translating them muddles the narrative.
+
+## Contributing
+
+Issues and PRs welcome. If you adapt the runbooks to another line of business (Auto, Life, Health, Group Benefits) or another geography, please open a PR under `demo-metadata/adaptations/<lob-or-country>/` so the next person doesn't reinvent it.
+
+## Credits
+
+Built with [Claude Code](https://claude.com/product/claude-code) by Nehuen Lobo (@nehuenlihue25) for the Seguros ALFA (Grupo Aval, Colombia) RFP engagement — presentation 2026-07-09.
+
+## License
+
+MIT (pending confirmation from the owner).

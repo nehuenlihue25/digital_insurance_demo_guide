@@ -1,28 +1,28 @@
 #!/usr/bin/env bash
 # =============================================================================
-# 05-bloque6-deploy-reports.sh
+# 05-block6-deploy-reports.sh
 # -----------------------------------------------------------------------------
-# Bloque 6 del RFP Seguros ALFA - Deploy de Custom Report Types, Reports y
-# Dashboards para la carpeta "Seguros ALFA Pyme".
+# Block 6 of the Seguros ALFA RFP - Deploys Custom Report Types, Reports, and
+# Dashboards for the "Seguros ALFA Pyme" folder.
 #
-# POR QUE NO USAMOS `sf project deploy start`:
-#   El binario `sf` intenta escribir un lockfile en ~/.sfdx/ (por ej.
-#   `~/.sfdx/stash.json.lock`) al arrancar cualquier comando de deploy.
-#   El sandbox de este entorno bloquea escrituras fuera del cwd y $TMPDIR,
-#   por lo que el comando falla con EACCES antes siquiera de contactar la org.
-#   `sf data query` y `sf org display` funcionan porque son lecturas y toleran
-#   `SF_DISABLE_LOG_FILE=true` sin tocar el stash.
+# WHY WE DON'T USE `sf project deploy start`:
+#   The `sf` binary tries to write a lockfile under ~/.sfdx/ (e.g.
+#   `~/.sfdx/stash.json.lock`) when any deploy command starts up. The
+#   sandbox in this environment blocks writes outside cwd and $TMPDIR, so
+#   the command fails with EACCES before it even contacts the org.
+#   `sf data query` and `sf org display` work because they're read-only and
+#   tolerate `SF_DISABLE_LOG_FILE=true` without touching the stash.
 #
-#   Solucion: empaquetar el metadata en formato MDAPI y hablar directamente
-#   con la Metadata API por SOAP (endpoint /services/Soap/m/62.0). Solo
-#   necesitamos accessToken + instanceUrl, que se leen con `sf org display`.
+#   Workaround: package the metadata as MDAPI and talk directly to the
+#   Metadata API over SOAP (endpoint /services/Soap/m/62.0). We only need
+#   accessToken + instanceUrl, which we read with `sf org display`.
 #
-# Prerequisitos:
-#   - Alias/org autenticada (default DevHub o target-org).
-#   - Metadata ya en formato MDAPI en:
-#       ../metadata/custom-report-types/     (paquete CRTs)
-#       ../metadata/reports-dashboards/      (paquete Reports + Dashboards)
-#   - Python 3 (para parse JSON y XML) y zip disponibles en PATH.
+# Prerequisites:
+#   - An authenticated alias/org (default DevHub or target-org).
+#   - Metadata already in MDAPI format at:
+#       ../metadata/custom-report-types/     (CRT package)
+#       ../metadata/reports-dashboards/      (Reports + Dashboards package)
+#   - Python 3 (for JSON and XML parsing) and zip available on PATH.
 # =============================================================================
 
 set -euo pipefail
@@ -30,7 +30,7 @@ set -euo pipefail
 export SF_DISABLE_LOG_FILE=true
 
 # -----------------------------------------------------------------------------
-# Rutas
+# Paths
 # -----------------------------------------------------------------------------
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 METADATA_DIR="$(cd "${SCRIPT_DIR}/../metadata" && pwd)"
@@ -46,23 +46,23 @@ FOLDER_NAME="Seguros ALFA Pyme"
 FOLDER_DEV_NAME="Seguros_ALFA_Pyme"
 
 echo "=============================================================="
-echo " Bloque 6 - Deploy Reports & Dashboards (MDAPI via SOAP)"
+echo " Block 6 - Deploy Reports & Dashboards (MDAPI via SOAP)"
 echo "=============================================================="
 
 # -----------------------------------------------------------------------------
-# Prerequisitos
+# Prerequisites
 # -----------------------------------------------------------------------------
 if [[ ! -d "${CRT_DIR}" ]] || [[ ! -f "${CRT_DIR}/package.xml" ]]; then
-  echo "ERROR: no se encontro paquete CRT en ${CRT_DIR}" >&2
+  echo "ERROR: CRT package not found at ${CRT_DIR}" >&2
   exit 1
 fi
 if [[ ! -d "${REPORTS_DIR}" ]] || [[ ! -f "${REPORTS_DIR}/package.xml" ]]; then
-  echo "ERROR: no se encontro paquete Reports/Dashboards en ${REPORTS_DIR}" >&2
+  echo "ERROR: Reports/Dashboards package not found at ${REPORTS_DIR}" >&2
   exit 1
 fi
 for bin in zip python3 curl; do
   if ! command -v "${bin}" >/dev/null 2>&1; then
-    echo "ERROR: binario requerido no encontrado: ${bin}" >&2
+    echo "ERROR: required binary not found: ${bin}" >&2
     exit 1
   fi
 done
@@ -71,11 +71,11 @@ done
 # Access token + instance URL (sf org display --verbose)
 # -----------------------------------------------------------------------------
 echo ""
-echo "[auth] Obteniendo accessToken e instanceUrl via 'sf org display'..."
+echo "[auth] Fetching accessToken and instanceUrl via 'sf org display'..."
 ORG_JSON="$(sf org display --json --verbose 2>/dev/null || true)"
 if [[ -z "${ORG_JSON}" ]]; then
-  echo "ERROR: 'sf org display --json --verbose' no devolvio nada." >&2
-  echo "       Asegurate de tener una target-org autenticada." >&2
+  echo "ERROR: 'sf org display --json --verbose' returned nothing." >&2
+  echo "       Make sure you have an authenticated target-org." >&2
   exit 1
 fi
 
@@ -83,19 +83,19 @@ ACCESS_TOKEN="$(printf '%s' "${ORG_JSON}" | python3 -c 'import sys,json;d=json.l
 INSTANCE_URL="$(printf '%s' "${ORG_JSON}" | python3 -c 'import sys,json;d=json.load(sys.stdin);print(d["result"]["instanceUrl"])')"
 
 if [[ -z "${ACCESS_TOKEN}" ]] || [[ -z "${INSTANCE_URL}" ]]; then
-  echo "ERROR: no se pudo extraer accessToken/instanceUrl del JSON." >&2
+  echo "ERROR: could not extract accessToken/instanceUrl from JSON." >&2
   exit 1
 fi
 echo "[auth]   instanceUrl = ${INSTANCE_URL}"
-echo "[auth]   accessToken = ${ACCESS_TOKEN:0:12}...(truncado)"
+echo "[auth]   accessToken = ${ACCESS_TOKEN:0:12}...(truncated)"
 
 SOAP_ENDPOINT="${INSTANCE_URL}/services/Soap/m/${API_VERSION}"
 
 # -----------------------------------------------------------------------------
-# Paso 1: crear Folders (Report y Dashboard) via sf data create record
+# Step 1: create Folders (Report and Dashboard) via sf data create record
 # -----------------------------------------------------------------------------
 echo ""
-echo "[paso 1] Creando Folders '${FOLDER_NAME}' (Report + Dashboard) si no existen..."
+echo "[step 1] Creating '${FOLDER_NAME}' folders (Report + Dashboard) if they don't exist..."
 
 ensure_folder() {
   local folder_type="$1"  # Report | Dashboard
@@ -106,44 +106,44 @@ ensure_folder() {
     python3 -c 'import sys,json;d=json.load(sys.stdin);r=d.get("result",{}).get("records",[]);print(r[0]["Id"] if r else "")')"
 
   if [[ -n "${existing}" ]]; then
-    echo "[paso 1]   Folder ${folder_type} ya existe: ${existing}"
+    echo "[step 1]   Folder ${folder_type} already exists: ${existing}"
     return 0
   fi
 
-  echo "[paso 1]   Creando Folder ${folder_type}..."
+  echo "[step 1]   Creating Folder ${folder_type}..."
   sf data create record --sobject Folder \
     --values "Name='${FOLDER_NAME}' DeveloperName=${FOLDER_DEV_NAME} Type=${folder_type} AccessType=Public" \
     >/dev/null
-  echo "[paso 1]   Folder ${folder_type} creado."
+  echo "[step 1]   Folder ${folder_type} created."
 }
 
 ensure_folder "Report"
 ensure_folder "Dashboard"
 
 # -----------------------------------------------------------------------------
-# Helper: deploy_mdapi_soap <zip_path> <etiqueta>
-#   1. base64 encode del zip
-#   2. envelope SOAP met:deploy
+# Helper: deploy_mdapi_soap <zip_path> <label>
+#   1. base64-encode the zip
+#   2. build the SOAP envelope for met:deploy
 #   3. POST via curl -> asyncId
-#   4. Loop checkDeployStatus hasta done=true
-#   5. Parsear successes/failures y reportar
+#   4. Loop checkDeployStatus until done=true
+#   5. Parse successes/failures and report
 # -----------------------------------------------------------------------------
 deploy_mdapi_soap() {
   local zip_path="$1"
   local label="$2"
 
   echo ""
-  echo "[deploy:${label}] Zip a deployar: ${zip_path}"
+  echo "[deploy:${label}] Zip to deploy: ${zip_path}"
   local zip_size
   zip_size="$(wc -c < "${zip_path}" | tr -d ' ')"
-  echo "[deploy:${label}] Tamano: ${zip_size} bytes"
+  echo "[deploy:${label}] Size: ${zip_size} bytes"
 
-  # 1) base64 encode (single line, sin newlines)
+  # 1) base64 encode (single line, no newlines)
   local b64_file="${WORK_DIR}/${label}.b64"
   base64 < "${zip_path}" | tr -d '\n' > "${b64_file}"
 
-  # 2) SOAP envelope con met:deploy
-  #    DeployOptions minimas: singlePackage=true, rollbackOnError=true.
+  # 2) SOAP envelope with met:deploy
+  #    Minimal DeployOptions: singlePackage=true, rollbackOnError=true.
   local deploy_envelope="${WORK_DIR}/${label}-deploy.xml"
   {
     printf '%s' '<?xml version="1.0" encoding="utf-8"?>'
@@ -160,7 +160,7 @@ deploy_mdapi_soap() {
   } > "${deploy_envelope}"
 
   # 3) POST -> asyncId
-  echo "[deploy:${label}] Enviando SOAP deploy a ${SOAP_ENDPOINT}..."
+  echo "[deploy:${label}] Sending SOAP deploy to ${SOAP_ENDPOINT}..."
   local deploy_resp="${WORK_DIR}/${label}-deploy-resp.xml"
   curl -sS -X POST "${SOAP_ENDPOINT}" \
     -H 'Content-Type: text/xml; charset=UTF-8' \
@@ -183,13 +183,13 @@ else:
 ' "${deploy_resp}")"
 
   if [[ -z "${async_id}" ]]; then
-    echo "ERROR: no se obtuvo asyncId. Respuesta cruda:" >&2
+    echo "ERROR: did not get an asyncId. Raw response:" >&2
     cat "${deploy_resp}" >&2
     return 1
   fi
   echo "[deploy:${label}] asyncId = ${async_id}"
 
-  # 4) Poll checkDeployStatus hasta done=true
+  # 4) Poll checkDeployStatus until done=true
   local status_envelope="${WORK_DIR}/${label}-status.xml"
   {
     printf '%s' '<?xml version="1.0" encoding="utf-8"?>'
@@ -204,11 +204,11 @@ else:
 
   local status_resp="${WORK_DIR}/${label}-status-resp.xml"
   local attempt=0
-  local max_attempts=60   # ~ 60 * 5s = 5 minutos
+  local max_attempts=60   # ~ 60 * 5s = 5 minutes
   local done_flag="false"
 
-  # Espera inicial de 10s segun contrato del script
-  echo "[deploy:${label}] Espera inicial 10s antes de primer poll..."
+  # Initial 10s wait per script contract
+  echo "[deploy:${label}] Initial 10s wait before the first poll..."
   sleep 10
 
   while (( attempt < max_attempts )); do
@@ -243,11 +243,11 @@ print(m.group(1) if m else "?")
   done
 
   if [[ "${done_flag}" != "true" ]]; then
-    echo "ERROR: deploy no termino tras ${max_attempts} polls" >&2
+    echo "ERROR: deploy did not finish after ${max_attempts} polls" >&2
     return 1
   fi
 
-  # 5) Parsear componentSuccesses / componentFailures y reportar
+  # 5) Parse componentSuccesses / componentFailures and report
   python3 - "${status_resp}" "${label}" <<'PY'
 import sys, re
 resp_path, label = sys.argv[1], sys.argv[2]
@@ -280,10 +280,10 @@ PY
 }
 
 # -----------------------------------------------------------------------------
-# Paso 2: deploy CRTs primero (los reports dependen de ellos)
+# Step 2: deploy CRTs first (the reports depend on them)
 # -----------------------------------------------------------------------------
 echo ""
-echo "[paso 2] Zipeando y deployando Custom Report Types..."
+echo "[step 2] Zipping and deploying Custom Report Types..."
 CRT_ZIP="${WORK_DIR}/mdapi-crt.zip"
 (
   cd "${CRT_DIR}"
@@ -292,17 +292,17 @@ CRT_ZIP="${WORK_DIR}/mdapi-crt.zip"
 deploy_mdapi_soap "${CRT_ZIP}" "crt"
 
 # -----------------------------------------------------------------------------
-# Paso 3: espera adicional 10s antes de reports (buffer entre deploys)
+# Step 3: additional 10s wait before reports (buffer between deploys)
 # -----------------------------------------------------------------------------
 echo ""
-echo "[paso 3] Espera 10s antes de deploy de reports+dashboards..."
+echo "[step 3] Waiting 10s before deploying reports+dashboards..."
 sleep 10
 
 # -----------------------------------------------------------------------------
-# Paso 4: deploy Reports + Dashboards (mismo patron SOAP)
+# Step 4: deploy Reports + Dashboards (same SOAP pattern)
 # -----------------------------------------------------------------------------
 echo ""
-echo "[paso 4] Zipeando y deployando Reports + Dashboards..."
+echo "[step 4] Zipping and deploying Reports + Dashboards..."
 REPORTS_ZIP="${WORK_DIR}/mdapi-reports.zip"
 (
   cd "${REPORTS_DIR}"
@@ -311,17 +311,17 @@ REPORTS_ZIP="${WORK_DIR}/mdapi-reports.zip"
 deploy_mdapi_soap "${REPORTS_ZIP}" "reports"
 
 # -----------------------------------------------------------------------------
-# Paso 5: espera 10s antes de verify
+# Step 5: wait 10s before verify
 # -----------------------------------------------------------------------------
 echo ""
-echo "[paso 5] Espera 10s antes de verify..."
+echo "[step 5] Waiting 10s before verify..."
 sleep 10
 
 # -----------------------------------------------------------------------------
-# Paso 6: verify - COUNT de Report y Dashboard en el folder
+# Step 6: verify - COUNT of Report and Dashboard in the folder
 # -----------------------------------------------------------------------------
 echo ""
-echo "[paso 6] Verificando cantidades en folder '${FOLDER_DEV_NAME}'..."
+echo "[step 6] Verifying counts in folder '${FOLDER_DEV_NAME}'..."
 
 REPORT_COUNT="$(sf data query \
   --query "SELECT COUNT(Id) c FROM Report WHERE FolderName='${FOLDER_NAME}'" \
@@ -333,10 +333,10 @@ DASHBOARD_COUNT="$(sf data query \
   --json 2>/dev/null | \
   python3 -c 'import sys,json;d=json.load(sys.stdin);print(d["result"]["records"][0]["c"])')"
 
-echo "[paso 6]   Reports    en '${FOLDER_NAME}': ${REPORT_COUNT}"
-echo "[paso 6]   Dashboards en '${FOLDER_NAME}': ${DASHBOARD_COUNT}"
+echo "[step 6]   Reports    in '${FOLDER_NAME}': ${REPORT_COUNT}"
+echo "[step 6]   Dashboards in '${FOLDER_NAME}': ${DASHBOARD_COUNT}"
 
 echo ""
 echo "=============================================================="
-echo "Reports y Dashboards deployados. Verificar en la app Reports -> Folder 'Seguros ALFA Pyme'"
+echo "Reports and Dashboards deployed. Verify in the Reports app -> Folder 'Seguros ALFA Pyme'"
 echo "=============================================================="
