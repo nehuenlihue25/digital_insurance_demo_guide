@@ -1,12 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Report xmlns="http://soap.sforce.com/2006/04/metadata">
-    <columns>
-        <field>ClaimCoveragePaymentDetail$Id</field>
-    </columns>
+    <chart>
+        <backgroundColor1>#FFFFFF</backgroundColor1>
+        <backgroundColor2>#FFFFFF</backgroundColor2>
+        <backgroundFadeDir>Diagonal</backgroundFadeDir>
+        <chartSummaries>
+            <aggregate>Sum</aggregate>
+            <axisBinding>y</axisBinding>
+            <column>ClaimCoveragePaymentDetail$PaymentAmount</column>
+        </chartSummaries>
+        <chartType>HorizontalBar</chartType>
+        <groupingColumn>ClaimCoveragePaymentDetail$PaymentStatus</groupingColumn>
+        <legendPosition>Right</legendPosition>
+        <location>CHART_BOTTOM</location>
+        <size>Medium</size>
+        <summaryAxisRange>Auto</summaryAxisRange>
+        <textColor>#000000</textColor>
+        <textSize>12</textSize>
+        <title>Pagos Aprobados vs Pendientes</title>
+        <titleColor>#000000</titleColor>
+        <titleSize>14</titleSize>
+    </chart>
     <columns>
         <field>ClaimCoveragePaymentDetail$Name</field>
     </columns>
-    <format>Tabular</format>
+    <columns>
+        <field>ClaimCoveragePaymentDetail$Type</field>
+    </columns>
+    <columns>
+        <field>ClaimCoveragePaymentDetail$PaymentAmount</field>
+        <aggregateTypes>Sum</aggregateTypes>
+    </columns>
+    <format>Summary</format>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>ClaimCoveragePaymentDetail$PaymentStatus</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
     <name>Pagos Aprobados vs Pendientes Pyme</name>
     <reportType>ClaimCoveragePaymentDetail_Pyme__c</reportType>
     <scope>organization</scope>

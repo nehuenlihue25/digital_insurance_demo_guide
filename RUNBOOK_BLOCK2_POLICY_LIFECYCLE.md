@@ -1,6 +1,6 @@
 # Runbook — Block 2: Full policy lifecycle
 
-**Duration**: 30 min | **Presenter**: Luis Fabián Rodríguez | **Org**: ins-qbranch-alfa (https://storm-c90aab66569c63.my.salesforce.com)
+**Duration**: 45 min | **Presenter**: Luis Fabián Rodríguez | **Org**: ins-qbranch-alfa (https://storm-c90aab66569c63.my.salesforce.com)
 
 > *All talk tracks below are sample scripts written in English for reference. Deliver them in the client's language (Spanish) on the day of the presentation.*
 
@@ -54,7 +54,7 @@ On tab 1 (POL-PYME-2026-0001) confirm:
 
 On tab 4 (InsurancePolicyTransaction list) confirm:
 - The List View dropdown at the top left of the list **may default to "Recently Viewed"**, which returns an empty list if those records weren't opened in the current session. **Change it to "All"** (click the dropdown → "All"). Pin "All" as default with the pin/star if the UI allows, so it doesn't reset.
-- With "All" selected, the 2 records should appear: **POL-PYME-2026-0001 — Emisión** and **POL-PYME-2026-0001 — Endoso 001 Incendio**.
+- With "All" selected, the 4 records should appear: **POL-PYME-2026-0001 — Emisión**, **POL-PYME-2026-0001 — Endoso 001 Incendio**, **POL-PYME-2026-0001 — Renovación 2027**, **POL-PYME-2026-0001 — Solicitud de Cancelación**.
 
 On tab 5 (InsurancePolicyProductClause list) confirm:
 - Same warning: change List View to **"All"** (default is often "Recently Viewed" and returns empty).
@@ -71,7 +71,7 @@ On tab 5 (InsurancePolicyProductClause list) confirm:
 
 ## 1. Context and objective of the block (30 sec)
 
-This block demonstrates the **full lifecycle of a Pyme policy** already issued on the platform: how it is structured against the insured account, how coverages break down with their limits, deductibles and premiums, how financial transactions (issuance and endorsement) are persisted, and how the clause engine automatically brings the product's clause set while allowing manual client-specific clauses. For ALFA, this is the functional evidence that the standard Salesforce Insurance model supports the end-to-end flow on native objects, with no custom code.
+This block demonstrates the **full lifecycle of a Pyme policy** already issued on the platform: how it is structured against the insured account, how coverages break down with their limits, deductibles and premiums, how financial transactions (issuance, endorsement, renewal, cancellation) are persisted, how the clause engine automatically brings the product's clause set while allowing manual client-specific clauses, and how payment methods live as PCI-compliant standard sObjects. We close with an architectural framing that covers recurring collection scheduling, retry logic, integration and bank file generation — the pieces that go beyond the native Digital Insurance footprint and are addressed with RLM `PaymentSchedule` + Custom Metadata + MuleSoft. For ALFA, this is the functional evidence that the standard Salesforce Insurance model supports the end-to-end flow on native objects, with clear extension paths for everything else.
 
 ---
 
@@ -176,9 +176,11 @@ This block demonstrates the **full lifecycle of a Pyme policy** already issued o
 **Click / navigation:**
 1. Ctrl+Tab to tab 4 (`/lightning/o/InsurancePolicyTransaction/list`).
 2. **Check the List View**: the dropdown at the top left of the list should say **"All"**. If it says **"Recently Viewed"** (frequent default), the list appears empty — click the dropdown → select **"All"**.
-3. With "All" selected two rows are visible:
+3. With "All" selected four rows are visible:
    - **POL-PYME-2026-0001 — Emisión**
    - **POL-PYME-2026-0001 — Endoso 001 Incendio**
+   - **POL-PYME-2026-0001 — Renovación 2027** (covered in step 2.8)
+   - **POL-PYME-2026-0001 — Solicitud de Cancelación** (covered in step 2.9)
 4. Click the first: **POL-PYME-2026-0001 — Emisión**.
 5. On screen: transaction detail with:
    - **Type**: Premium Payment
@@ -189,7 +191,7 @@ This block demonstrates the **full lifecycle of a Pyme policy** already issued o
 7. On screen: detail with **Type = Endorsement**, **Category = Endorsement**, **Status = Approved**.
 
 **What to say (talk track):**
-> "Every event in a policy's lifetime — issuance, an endorsement, a cancellation, a renewal, a premium payment — is recorded as an **InsurancePolicyTransaction**. In this case we have two: the **original issuance** of the policy on June 1, categorized as Issuance, and an **Endorsement 001** on the fire coverage, categorized as Endorsement. Both transactions reference the policy via lookup. This gives ALFA complete audit: for any date in the lifecycle I can reconstruct what state the policy was in and why it changed."
+> "Every event in a policy's lifetime — issuance, an endorsement, a cancellation, a renewal, a premium payment — is recorded as an **InsurancePolicyTransaction**. In this case we have four: the **original issuance** of the policy on June 1 categorized as Issuance, an **Endorsement 001** on the fire coverage categorized as Endorsement, a **planned renewal** for 2027 (Type=Renewal, we'll drill into it in a moment), and a **cancellation request** with a pro-rated refund (Type=Cancellation, we'll cover it too). All four transactions reference the policy via lookup. This gives ALFA complete audit: for any date in the lifecycle I can reconstruct what state the policy was in and why it changed."
 
 **Emphasis points:**
 - Transactional model = regulatory audit.
@@ -240,7 +242,7 @@ This block demonstrates the **full lifecycle of a Pyme policy** already issued o
 3. Show the full field block: Policy Name, Status, Policy Type = BOP (Business Owners), Effective Date, Expiration Date, Premium Amount, Name Insured.
 
 **What to say (talk track):**
-> "Closing the loop: the policy we started looking at a few minutes ago has behind it **one account, six coverages, two transactions and six clauses** — all on standard objects, all with native relationships, all queryable via SOQL or Salesforce reports. This is the point: **the full lifecycle of the policy lives in the core**, not in integrations or parallel custom tables."
+> "Closing the loop: the policy we started looking at a few minutes ago has behind it **one account, six coverages, four transactions, six clauses and two payment methods on file** — all on standard objects, all with native relationships, all queryable via SOQL or Salesforce reports. This is the point: **the full lifecycle of the policy lives in the core**, not in integrations or parallel custom tables. In a moment we'll show renewal, cancellation and the payment methods, and then we'll close with an architectural framing for the pieces that go beyond the native footprint."
 
 **Emphasis points:**
 - "In the core" — root message of ALFA's RFP (Insurance on Core).
@@ -251,10 +253,88 @@ This block demonstrates the **full lifecycle of a Pyme policy** already issued o
 
 ---
 
-### Step 2.8 — Block close (30 sec)
+### Step 2.8 — Renewal (3 min)
+
+**Click / navigation:**
+1. Ctrl+Tab to tab 4 (`/lightning/o/InsurancePolicyTransaction/list`, "All").
+2. With the 4 rows now visible, click **POL-PYME-2026-0001 — Renovación 2027**.
+3. On screen: transaction detail with:
+   - **Type**: Renewal
+   - **Category**: Renewal
+   - **Status**: Approved
+   - **EffectiveDate**: 2027-06-01
+   - **TransactionAmount**: 2,520,000 (a 5% increase over the original 2.4M for inflation)
+   - **Description**: "Planned renewal for the 2027-2028 policy term…"
+4. Ctrl+Tab back to tab 1 (POL-PYME-2026-0001) to keep the base policy in view.
 
 **What to say (talk track):**
-> "That closes the policy lifecycle. In 30 minutes we walked through issuance, coverage structure, transactions and clause set — including the clause engine that in the original script was Block 5 and here we integrated for coherence. Happy to take any questions before moving to Claims, which is the next block."
+> "The renewal moment is also modeled as a transaction: **Type = Renewal, Category = Renewal**, effective June 1, 2027 with a **premium adjusted to 2.52 million pesos**, a 5% adjustment for inflation. In production, ALFA can trigger this transaction from a **scheduled Flow** — for example, 90 days before ExpirationDate the system automatically drafts the renewal transaction, kicks off an underwriting review if the profile has changed, and once approved, the transaction is confirmed. The original policy stays in force through May 31, 2027, and the renewal transaction defines the new term. In the audit trail, both terms live linked, referenceable side by side."
+
+**Emphasis points:**
+- Renewal = InsurancePolicyTransaction with Type=Renewal, native — not a custom module.
+- Automatable via scheduled Flow + Approval Process (declarative, no code).
+- Audit continuity: same policy, both terms linked.
+
+**If something doesn't appear:**
+- If the renewal transaction is not in the list: run script `03-block2-policy.sh` again (it's idempotent — creates it if missing).
+
+---
+
+### Step 2.9 — Cancellation (3 min)
+
+**Click / navigation:**
+1. Still on tab 4 (Transactions list "All"), click **POL-PYME-2026-0001 — Solicitud de Cancelación**.
+2. On screen: transaction detail with:
+   - **Type**: Cancellation
+   - **Category**: Cancellation
+   - **Status**: In Process (deliberately, so the demo can show the workflow moment)
+   - **EffectiveDate**: 2026-12-01
+   - **TransactionAmount**: **-1,200,000** (negative — pro-rated refund of unearned premium)
+   - **Description**: "Customer-requested cancellation effective 2026-12-01 — pro-rated refund of unearned premium"
+3. **Note (do not show live)**: the policy header still says Status = **In Force** — this is intentional for the demo. In production, once the cancellation is approved, the workflow flips `InsurancePolicy.Status = 'Cancelled'` and the `TerminatedDate` field. Here we keep the policy live so the rest of the demo (Block 3 claims) can still run.
+
+**What to say (talk track):**
+> "The cancellation flow is symmetric to the renewal. A customer request opens a **Cancellation transaction** — you see it here in Status = **In Process** because we simulate the approval moment. The transaction amount is **negative 1.2 million** — a pro-rated refund of unearned premium for the months from December to May that were paid in advance. Once the transaction goes to Approved status, a native Flow flips the policy's Status to Cancelled and sets the TerminatedDate. Native reversals — retention offers, reinstatement — are also modeled as transactions (Type = Reinstatement), so the entire lifecycle is on a single traceable timeline."
+
+**Emphasis points:**
+- Cancellation with **negative amount** = pro-rated refund, native financial calculation.
+- Status "In Process" = supports approval workflows before the change takes effect.
+- Reinstatement is another Type of the same object — same data model handles the reversal.
+
+**If something doesn't appear:**
+- If Status shows as "Approved" instead of "In Process": that's fine, the demo works either way — narrate as "already approved, ready to trigger the Status flip".
+
+---
+
+### Step 2.10 — Payment methods on file (2 min)
+
+**Click / navigation:**
+1. Ctrl+Tab to tab 2 (Account **Panadería La Espiga SAS**).
+2. Click the **Related** tab of the account.
+3. Scroll to find the **Card Payment Methods** related list (may be called Payment Methods depending on the org). Two records should appear:
+   - **Visa **** 4242** — Corporate Visa, CreditCard, ExpiryMonth=12/2028, Active
+   - **Mastercard **** 5555** — Backup Mastercard, DebitCard, ExpiryMonth=6/2027, Active
+4. Click **Visa **** 4242** to open the detail.
+5. On screen: `CardPaymentMethod` record with **AccountId** linked to Panadería, **CardCategory = CreditCard**, **CardLastFour = 4242** (tokenized, never the full PAN), **ProcessingMode = ExternalRecurring**.
+
+**What to say (talk track):**
+> "Payment methods live as standard sObjects — `CardPaymentMethod` for cards, `AlternativePaymentMethod` for digital wallets or bank accounts — associated to the Account. **The full card number is never persisted**: only the tokenized last four, in line with PCI-DSS. The insured can register multiple methods on file, and each active method is a candidate for the payment schedule associated to the policy. `ProcessingMode = ExternalRecurring` tells the system this method can be used for recurring premium charges, which is exactly the Pyme scenario — an annual policy with quarterly or monthly premium collection depending on the plan."
+
+**Emphasis points:**
+- Standard sObject, PCI-compliant (no PAN stored).
+- Multiple methods per Account, each with a role (primary / backup).
+- The link to the collection scheduling logic is via `PaymentAuthorizationAdjustment` / `PaymentScheduleItem` — see Section 6 for architecture.
+
+**If something doesn't appear:**
+- **If `CardPaymentMethod` is not enabled on the org**: the script skipped this section with a warning. In that case explain conceptually: "In this org the Payments module isn't provisioned, but the object is standard on any org with the Salesforce Payments PSL. It stores the tokenized method — never the full card number — linked to the Account".
+- If the related list isn't on the Account layout: use the direct URL `/lightning/o/CardPaymentMethod/list` and filter by AccountId.
+
+---
+
+### Step 2.11 — Block close (30 sec)
+
+**What to say (talk track):**
+> "That closes the policy lifecycle. In 45 minutes we walked through issuance, coverage structure, endorsement transactions, planned renewal, cancellation with pro-rated refund, clause set with auto-added and manual clauses, and payment methods on file — all on standard objects. Everything you saw is queryable, auditable, and native. Before jumping to Claims, in the next 5 minutes I'll walk through **how the pieces that don't have native OOTB coverage — recurring collection schedules, retry logic, bank file generation — are addressed architecturally**. Then we open Block 3."
 
 ---
 
@@ -275,13 +355,99 @@ This block demonstrates the **full lifecycle of a Pyme policy** already issued o
 
 ## 4. Transition to the next block
 
-> "Perfect. We saw that the policy is live, with six coverages, two transactions and six clauses. The natural next question is: what happens when a claim occurs against this policy? That's exactly **Block 3**: we'll open an incident against Panadería La Espiga and see the flow from FNOL to payment, triggered against one of the policy's coverages. Luis, switch to the next tab."
+> "Perfect. We saw that the policy is live, with six coverages, four transactions (issuance, endorsement, renewal, cancellation request), six clauses and two payment methods on file. The natural next question is: what happens when a claim occurs against this policy? That's exactly **Block 3**: we'll open an incident against Panadería La Espiga and see the flow from FNOL to payment, triggered against one of the policy's coverages. Luis, switch to the next tab."
 
 **Note to Luis (do not read out loud)**: in the original script the transition explicitly named the "fire coverage". The Block 3 runbook may point to Equipo Electrónico (an oven / equipment claim) instead of Incendio. To avoid contradictions live, this transition **does not name the specific coverage** — it just says "one of the coverages". Block 3 opens with the claim detail and names the correct coverage there. In step 0.2 the mapping must be confirmed before kickoff.
 
 ---
 
-## 5. General block fallbacks
+## 5. Architecture and extensions — beyond the native lifecycle
+
+*This section is designed to answer the questions Luis Fabián flagged that go beyond what Digital Insurance covers out of the box: recurring collection by payment method, per-sponsor scheduling parameters, retry logic, payment method updates, integration surface, mass file ingest, and bank file generation. Deliver these transparently — the platform doesn't ship all of them as OOTB features on Digital Insurance itself, but each has a clear, supported extension path.*
+
+### 5.1 Native vs. extension map (share this table if the client asks)
+
+| Requirement | Native in Digital Insurance | Extension path |
+|---|---|---|
+| Renewal | ✅ `InsurancePolicyTransaction.Type=Renewal` + optional scheduled Flow | — |
+| Cancellation with pro-rated refund | ✅ `InsurancePolicyTransaction.Type=Cancellation` + negative amount | — |
+| Endorsement (mid-term change) | ✅ `InsurancePolicyTransaction.Type=Endorsement` | — |
+| Reinstatement | ✅ `Type=Reinstatement` / `Type=Reinstatement by Payment Schedule` | — |
+| Payment methods on file (card, bank) | ✅ `CardPaymentMethod`, `AlternativePaymentMethod` (Salesforce Payments PSL) | — |
+| Update / replace payment method | ✅ Standard record update on the payment method sObject | — |
+| Recurring collection schedule by method (savings 2x/day, credit card 2x/week) | ⚠️ Not native to Digital Insurance | (a) **Salesforce Billing** (managed package, adds `BillingSchedule` + payment runs), (b) **Revenue Lifecycle Management** (`PaymentSchedule` + `PaymentScheduleItem` — see 5.2), (c) custom Apex batch + custom object per sponsor |
+| Per-sponsor collection parameters | ⚠️ Not native | **Custom Metadata Types** with a "Sponsor" record type — declarative, no code, versionable per environment |
+| Retry logic on payment failures | ⚠️ Partial (via gateway response) | `PaymentScheduleItem.PaymentRetryCount` + `NextPaymentRetryTime` (RLM) + custom Flow for retry policy — see 5.3 |
+| Integration with the bank / gateway | ⚠️ Architecture — no OOTB | **MuleSoft** for API mediation, **Platform Events** for async choreography, **External Services** for point-to-point |
+| Mass file ingest (payments received from bank) | ✅ Bulk API / Data Loader / Data Import Wizard | — |
+| Mass bank file generation (payment order to bank) | ⚠️ Not native | Custom Apex + **Files** (`ContentVersion`) for text/XML/CSV, or **MuleSoft** for direct SFTP delivery |
+
+### 5.2 Recurring collection scheduling (the "cobranza calendarizada" question)
+
+Digital Insurance itself doesn't ship a collection scheduler that runs "savings account 2x/day, credit card 2x/week". That level of scheduling logic is in **Revenue Lifecycle Management (RLM)** — same license family the customer already has enabled for the Quote + Product Configurator in Block 1.
+
+Model:
+
+```
+InsurancePolicy 1───n InsurancePolicyTransaction (Premium Payment)
+                       │
+                       └── links to a PaymentSchedule
+                             │
+                             └── PaymentScheduleItem (one per due date)
+                                   ├── PaymentMethodId → CardPaymentMethod / AlternativePaymentMethod
+                                   ├── NextPaymentRetryTime
+                                   ├── PaymentRetryCount
+                                   └── PaymentGatewayErrorCategory
+```
+
+Sponsor-specific rules (e.g., "corporate group X collects debit card holders on Mondays and Thursdays") are held in **Custom Metadata Types** with one record per Sponsor. A single Flow reads the CMT record for the sponsor, computes the next due date, and inserts `PaymentScheduleItem` rows. Because CMT is declarative, ALFA's ops team can maintain sponsor parameters without a developer, and the config travels between sandboxes/production via metadata deployments.
+
+### 5.3 Retry logic
+
+RLM's `PaymentScheduleItem` object comes with the retry fields already declared:
+
+- `PaymentRetryCount` — increments on each failed attempt
+- `NextPaymentRetryTime` — when the next attempt is scheduled
+- `PaymentGatewayErrorCategory` — categorized reason for failure (`CardLimit`, `GatewayConnection`, `Security`, `ValidationFailure`, etc.)
+
+The retry policy itself is declarative: a **Flow** that reads `PaymentGatewayErrorCategory` decides whether to retry (transient errors), route to a case for manual intervention (validation errors), or cancel the scheduled item and notify the customer (security / permanent errors). This is the pattern Salesforce recommends over hardcoding retry logic in Apex — the Flow surfaces the policy visually to the ops team.
+
+### 5.4 Integration surface
+
+| Integration pattern | When to use | Salesforce building block |
+|---|---|---|
+| Sync REST call to payment gateway | Low-volume, response-time-critical (charge a card) | **External Services** or Named Credentials + Apex callout |
+| Async event delivery to legacy core | Fire-and-forget policy state changes | **Platform Events** or Change Data Capture |
+| Batch daily file exchange with bank | Nightly settlement / reconciliation | **MuleSoft** for orchestration + SFTP, or Apex Scheduled + `ContentVersion` for the file |
+| Federated customer data across systems | Unified 360 without full migration | **Data Cloud** |
+
+For ALFA's target state, the recommended pattern is MuleSoft mediating the bank / gateway APIs, with Platform Events used to broadcast policy state changes to the legacy issuance system during transition.
+
+### 5.5 Mass file ingest (payments coming FROM the bank)
+
+Salesforce already supports this natively — no custom code needed for typical use cases:
+
+- **Data Loader** or **Data Import Wizard** for one-shot imports
+- **Bulk API 2.0** for automated pipelines (MuleSoft can call this)
+- **Custom Metadata + Flow** to map bank-specific file formats to `InsurancePolicyTransaction` / `PaymentScheduleItem` records at ingest time
+
+### 5.6 Mass file generation (payment orders TO the bank)
+
+This is where custom code enters, but only lightly:
+
+- A **Scheduled Apex** batch runs nightly, queries the `PaymentScheduleItem` records due that day, and writes them into a `ContentVersion` (Salesforce File) in the bank's expected format (typically CSV or an XML dialect like ISO 20022 pain.001).
+- The file is either delivered via SFTP by MuleSoft, or pushed via a REST endpoint if the bank supports it.
+- Every generated file is stored on the `Account` (or a dedicated `BankFileBatch__c` custom object) for traceability.
+
+Typical build size: **1 Apex class + 1 Custom Metadata Type for the bank format + 1 Scheduled Flow trigger**. About 2-3 sprint days including tests.
+
+### 5.7 Prepared answer if the client presses hard on cobranza
+
+> "The full lifecycle up to the cancellation transaction lives on standard objects, native. The **recurring collection scheduling per method and per sponsor** is not part of the Digital Insurance native footprint — it's part of the Revenue Lifecycle Management license family, which the customer's IDO already has. So the architecture we recommend is: keep every event **on the policy transaction timeline** (Digital Insurance), delegate the **when-to-charge / how-to-retry** to RLM's `PaymentSchedule`, and hold sponsor-specific parameters in **Custom Metadata Types** so the ops team can change them without a release. If you want to see the concrete data model, we can drill in during the follow-up workshop."
+
+---
+
+## 6. General block fallbacks
 
 ### Gotcha #1 — Transactions/Clauses related list not visible on the default layout
 - **Symptom**: on the InsurancePolicy Related tab only Coverages (6 rows) appear. No Transactions or Clauses.
@@ -330,17 +496,20 @@ This block demonstrates the **full lifecycle of a Pyme policy** already issued o
 
 ---
 
-## 6. Block success metrics
+## 7. Block success metrics
 
-At the end of the block, the ALFA audience (technology + business) should leave with these five convictions:
+At the end of the block, the ALFA audience (technology + business) should leave with these seven convictions:
 
 - [ ] The policy lives in a standard object (**InsurancePolicy**), not on a custom object.
 - [ ] Coverages are modeled as child records (**InsurancePolicyCoverage**), with structured limit, deductible and premium — and the sum matches the policy premium (2,400,000 COP: 800+600+400+300+200+100).
-- [ ] Every lifecycle event (issuance, endorsement, cancellation, renewal, payment) generates an **InsurancePolicyTransaction**, providing regulatory traceability.
+- [ ] Every lifecycle event (issuance, endorsement, **renewal, cancellation**, payment) generates an **InsurancePolicyTransaction**, providing regulatory traceability.
+- [ ] Renewal and cancellation are **not custom modules**: they are native `InsurancePolicyTransaction.Type` values with the same audit rules as the rest of the lifecycle.
+- [ ] Payment methods live as PCI-compliant standard sObjects (**CardPaymentMethod**, **AlternativePaymentMethod**) — never storing the full PAN, always tokenized.
 - [ ] The clause set is automatically copied from the product (AutoAdded) and admits negotiated per-policy clauses (Manual), with an immutable snapshot at the time of issuance.
 - [ ] The entire lifecycle relies on **Account** as the single source of customer truth — enabling a 360 view with sales, service and claims.
+- [ ] Requirements that go beyond the native footprint (recurring collection schedules, per-sponsor rules, retry logic, bank file generation) have a **clear, supported extension path**: RLM `PaymentSchedule` + Custom Metadata + MuleSoft — not a rebuild.
 
-If any of the five points isn't clear during the block, leverage the Q&A or the transition to Block 3 to reinforce it before moving on.
+If any of the points isn't clear during the block, leverage the Q&A, section 5 (architecture) or the transition to Block 3 to reinforce it before moving on.
 
 ---
 

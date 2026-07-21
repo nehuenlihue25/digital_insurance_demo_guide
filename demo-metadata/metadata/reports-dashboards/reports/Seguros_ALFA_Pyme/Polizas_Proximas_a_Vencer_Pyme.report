@@ -1,16 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Report xmlns="http://soap.sforce.com/2006/04/metadata">
     <columns>
-        <field>InsurancePolicy$Id</field>
-    </columns>
-    <columns>
         <field>InsurancePolicy$Name</field>
     </columns>
+    <columns>
+        <field>InsurancePolicy$Status</field>
+    </columns>
+    <columns>
+        <field>InsurancePolicy$PolicyType</field>
+    </columns>
+    <columns>
+        <field>InsurancePolicy$ExpirationDate</field>
+    </columns>
+    <columns>
+        <field>InsurancePolicy$TermPremium</field>
+    </columns>
     <format>Tabular</format>
-    <name>Pólizas Pyme Próximas a Vencer 90 Días</name>
+    <name>Polizas Pyme Proximas a Vencer 90 Dias</name>
     <reportType>InsurancePolicy_Pyme__c</reportType>
+    <rowLimit>10</rowLimit>
     <scope>organization</scope>
     <showDetails>true</showDetails>
     <showGrandTotal>true</showGrandTotal>
     <showSubTotals>true</showSubTotals>
+    <sortColumn>InsurancePolicy$ExpirationDate</sortColumn>
+    <sortOrder>Asc</sortOrder>
 </Report>

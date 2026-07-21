@@ -3,7 +3,7 @@
     <baseObject>ClaimCovReserveAdjustment</baseObject>
     <category>other</category>
     <deployed>true</deployed>
-    <description>CRT ALFA Pyme para ClaimCovReserveAdjustment</description>
+    <description>ALFA Pyme CRT for ClaimCovReserveAdjustment — exposes reserve adjustments per claim coverage with type and amount.</description>
     <label>Reservas Siniestros Pyme</label>
     <sections>
         <columns>
@@ -14,6 +14,26 @@
         <columns>
             <checkedByDefault>true</checkedByDefault>
             <field>Name</field>
+            <table>ClaimCovReserveAdjustment</table>
+        </columns>
+        <columns>
+            <checkedByDefault>true</checkedByDefault>
+            <field>AdjustmentAmount</field>
+            <table>ClaimCovReserveAdjustment</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>ReserveType</field>
+            <table>ClaimCovReserveAdjustment</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>AdjustmentDate</field>
+            <table>ClaimCovReserveAdjustment</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>ClaimCoverageId</field>
             <table>ClaimCovReserveAdjustment</table>
         </columns>
         <masterLabel>Reservas Siniestros Pyme</masterLabel>

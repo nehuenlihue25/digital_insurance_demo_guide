@@ -1,13 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Report xmlns="http://soap.sforce.com/2006/04/metadata">
-    <columns>
-        <field>InsurancePolicy$Id</field>
-    </columns>
+    <chart>
+        <backgroundColor1>#FFFFFF</backgroundColor1>
+        <backgroundColor2>#FFFFFF</backgroundColor2>
+        <backgroundFadeDir>Diagonal</backgroundFadeDir>
+        <chartSummaries>
+            <aggregate>Sum</aggregate>
+            <axisBinding>y</axisBinding>
+            <column>InsurancePolicy$TotalSumInsured</column>
+        </chartSummaries>
+        <chartType>HorizontalBar</chartType>
+        <groupingColumn>InsurancePolicy$PolicyType</groupingColumn>
+        <legendPosition>Right</legendPosition>
+        <location>CHART_BOTTOM</location>
+        <size>Medium</size>
+        <summaryAxisRange>Auto</summaryAxisRange>
+        <textColor>#000000</textColor>
+        <textSize>12</textSize>
+        <title>Cartera Pyme por Tipo de Poliza</title>
+        <titleColor>#000000</titleColor>
+        <titleSize>14</titleSize>
+    </chart>
     <columns>
         <field>InsurancePolicy$Name</field>
     </columns>
-    <format>Tabular</format>
-    <name>Cartera Pyme por Industria del Cliente</name>
+    <columns>
+        <field>InsurancePolicy$Status</field>
+    </columns>
+    <columns>
+        <field>InsurancePolicy$TotalSumInsured</field>
+        <aggregateTypes>Sum</aggregateTypes>
+    </columns>
+    <format>Summary</format>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>InsurancePolicy$PolicyType</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <name>Cartera Pyme por Tipo de Poliza</name>
     <reportType>InsurancePolicy_Pyme__c</reportType>
     <scope>organization</scope>
     <showDetails>true</showDetails>

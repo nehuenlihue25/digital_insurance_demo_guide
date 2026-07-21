@@ -1,16 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Report xmlns="http://soap.sforce.com/2006/04/metadata">
     <columns>
-        <field>InsurancePolicy$Id</field>
+        <field>InsurancePolicy$Name</field>
     </columns>
     <columns>
-        <field>InsurancePolicy$Name</field>
+        <field>InsurancePolicy$PolicyType</field>
+    </columns>
+    <columns>
+        <field>InsurancePolicy$Status</field>
+    </columns>
+    <columns>
+        <field>InsurancePolicy$EffectiveDate</field>
+    </columns>
+    <columns>
+        <field>InsurancePolicy$ExpirationDate</field>
+    </columns>
+    <columns>
+        <field>InsurancePolicy$TermPremium</field>
     </columns>
     <format>Tabular</format>
     <name>Total Prima Emitida Pyme</name>
     <reportType>InsurancePolicy_Pyme__c</reportType>
+    <rowLimit>100</rowLimit>
     <scope>organization</scope>
     <showDetails>true</showDetails>
     <showGrandTotal>true</showGrandTotal>
     <showSubTotals>true</showSubTotals>
+    <sortColumn>InsurancePolicy$TermPremium</sortColumn>
+    <sortOrder>Desc</sortOrder>
 </Report>

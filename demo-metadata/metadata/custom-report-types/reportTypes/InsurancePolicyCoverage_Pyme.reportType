@@ -3,7 +3,7 @@
     <baseObject>InsurancePolicyCoverage</baseObject>
     <category>other</category>
     <deployed>true</deployed>
-    <description>CRT ALFA Pyme para InsurancePolicyCoverage</description>
+    <description>ALFA Pyme CRT for InsurancePolicyCoverage — exposes status, effective/expiration dates and premium fields per coverage.</description>
     <label>Coberturas Pyme</label>
     <sections>
         <columns>
@@ -14,6 +14,51 @@
         <columns>
             <checkedByDefault>true</checkedByDefault>
             <field>Name</field>
+            <table>InsurancePolicyCoverage</table>
+        </columns>
+        <columns>
+            <checkedByDefault>true</checkedByDefault>
+            <field>Status</field>
+            <table>InsurancePolicyCoverage</table>
+        </columns>
+        <columns>
+            <checkedByDefault>true</checkedByDefault>
+            <field>InsurancePolicyId</field>
+            <table>InsurancePolicyCoverage</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>Product2Id</field>
+            <table>InsurancePolicyCoverage</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>EffectiveDate</field>
+            <table>InsurancePolicyCoverage</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>ExpirationDate</field>
+            <table>InsurancePolicyCoverage</table>
+        </columns>
+        <columns>
+            <checkedByDefault>true</checkedByDefault>
+            <field>StandardPremiumAmount</field>
+            <table>InsurancePolicyCoverage</table>
+        </columns>
+        <columns>
+            <checkedByDefault>true</checkedByDefault>
+            <field>TermPremiumAmount</field>
+            <table>InsurancePolicyCoverage</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>TotalTermPremiumAmount</field>
+            <table>InsurancePolicyCoverage</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>GrossWrittenPremium</field>
             <table>InsurancePolicyCoverage</table>
         </columns>
         <masterLabel>Coberturas Pyme</masterLabel>

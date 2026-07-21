@@ -3,8 +3,8 @@
     <baseObject>InsurancePolicy</baseObject>
     <category>other</category>
     <deployed>true</deployed>
-    <description>CRT ALFA Pyme para InsurancePolicy</description>
-    <label>Pólizas Pyme</label>
+    <description>ALFA Pyme CRT for InsurancePolicy — exposes status, dates and premium fields consumed by the Pyme dashboards.</description>
+    <label>Polizas Pyme</label>
     <sections>
         <columns>
             <checkedByDefault>true</checkedByDefault>
@@ -16,6 +16,66 @@
             <field>Name</field>
             <table>InsurancePolicy</table>
         </columns>
-        <masterLabel>Pólizas Pyme</masterLabel>
+        <columns>
+            <checkedByDefault>true</checkedByDefault>
+            <field>Status</field>
+            <table>InsurancePolicy</table>
+        </columns>
+        <columns>
+            <checkedByDefault>true</checkedByDefault>
+            <field>PolicyType</field>
+            <table>InsurancePolicy</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>PolicyTerm</field>
+            <table>InsurancePolicy</table>
+        </columns>
+        <columns>
+            <checkedByDefault>true</checkedByDefault>
+            <field>EffectiveDate</field>
+            <table>InsurancePolicy</table>
+        </columns>
+        <columns>
+            <checkedByDefault>true</checkedByDefault>
+            <field>ExpirationDate</field>
+            <table>InsurancePolicy</table>
+        </columns>
+        <columns>
+            <checkedByDefault>true</checkedByDefault>
+            <field>PremiumAmount</field>
+            <table>InsurancePolicy</table>
+        </columns>
+        <columns>
+            <checkedByDefault>true</checkedByDefault>
+            <field>TermPremium</field>
+            <table>InsurancePolicy</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>GrossWrittenPremium</field>
+            <table>InsurancePolicy</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>TotalSumInsured</field>
+            <table>InsurancePolicy</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>NameInsuredId</field>
+            <table>InsurancePolicy</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>ProductId</field>
+            <table>InsurancePolicy</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>PriorPolicyId</field>
+            <table>InsurancePolicy</table>
+        </columns>
+        <masterLabel>Polizas Pyme</masterLabel>
     </sections>
 </ReportType>

@@ -3,7 +3,7 @@
     <baseObject>ClaimCoveragePaymentDetail</baseObject>
     <category>other</category>
     <deployed>true</deployed>
-    <description>CRT ALFA Pyme para ClaimCoveragePaymentDetail</description>
+    <description>ALFA Pyme CRT for ClaimCoveragePaymentDetail — exposes payment status, amount and scheduled date.</description>
     <label>Pagos Siniestros Pyme</label>
     <sections>
         <columns>
@@ -14,6 +14,36 @@
         <columns>
             <checkedByDefault>true</checkedByDefault>
             <field>Name</field>
+            <table>ClaimCoveragePaymentDetail</table>
+        </columns>
+        <columns>
+            <checkedByDefault>true</checkedByDefault>
+            <field>PaymentStatus</field>
+            <table>ClaimCoveragePaymentDetail</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>Status</field>
+            <table>ClaimCoveragePaymentDetail</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>Type</field>
+            <table>ClaimCoveragePaymentDetail</table>
+        </columns>
+        <columns>
+            <checkedByDefault>true</checkedByDefault>
+            <field>PaymentAmount</field>
+            <table>ClaimCoveragePaymentDetail</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>ScheduledPaymentDate</field>
+            <table>ClaimCoveragePaymentDetail</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>ClaimCoverageId</field>
             <table>ClaimCoveragePaymentDetail</table>
         </columns>
         <masterLabel>Pagos Siniestros Pyme</masterLabel>

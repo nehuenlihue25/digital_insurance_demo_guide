@@ -250,6 +250,67 @@ ensure "InsurancePolicyTransaction" \
   "Name='POL-PYME-2026-0001 — Endoso 001 Incendio' TransactionNumber=$TXN_ENDOSO_NUMBER InsurancePolicyId=$POLICY_ID Type=Endorsement Category=Endorsement Status=Approved TransactionAmount=180000 EffectiveDate=2026-07-01 Description='Endorsement 001 on the Incendio coverage — Sum Insured adjustment'" \
   "Transaction Endorsement $TXN_ENDOSO_NUMBER" >/dev/null
 
+# 3. Renewal (planned renewal for the next term — runbook step 2.8)
+# Type='Renewal' generates a transaction amount for the renewed policy term
+# without creating a new InsurancePolicy record. This models the "renewal
+# intent" so the demo can walk through the renewal moment without breaking
+# the current In Force policy that the rest of Block 2 and Block 3 rely on.
+TXN_RENEWAL_NUMBER="TXN-PYME-2026-0001-003"
+ensure "InsurancePolicyTransaction" \
+  "SELECT Id FROM InsurancePolicyTransaction WHERE TransactionNumber='$TXN_RENEWAL_NUMBER' LIMIT 1" \
+  "Name='POL-PYME-2026-0001 — Renovación 2027' TransactionNumber=$TXN_RENEWAL_NUMBER InsurancePolicyId=$POLICY_ID Type=Renewal Category=Renewal Status=Approved TransactionAmount=2520000 EffectiveDate=2027-06-01 Description='Planned renewal for the 2027-2028 policy term — premium adjusted +5% for inflation'" \
+  "Transaction Renewal $TXN_RENEWAL_NUMBER" >/dev/null
+
+# 4. Cancellation Request (customer requested mid-term cancellation — demo scenario)
+# NOTE: this only creates the transaction record; it does NOT change
+# InsurancePolicy.Status to 'Cancelled'. In production the workflow would
+# flip the Policy status after cancellation approval; here we keep the
+# policy In Force so the rest of the demo (Block 3 claims flow) still works.
+TXN_CANCEL_NUMBER="TXN-PYME-2026-0001-004"
+ensure "InsurancePolicyTransaction" \
+  "SELECT Id FROM InsurancePolicyTransaction WHERE TransactionNumber='$TXN_CANCEL_NUMBER' LIMIT 1" \
+  "Name='POL-PYME-2026-0001 — Solicitud de Cancelación' TransactionNumber=$TXN_CANCEL_NUMBER InsurancePolicyId=$POLICY_ID Type=Cancellation Category=Cancellation Status='In Process' TransactionAmount=-1200000 EffectiveDate=2026-12-01 Description='Customer-requested cancellation effective 2026-12-01 — pro-rated refund of unearned premium'" \
+  "Transaction Cancellation Request $TXN_CANCEL_NUMBER" >/dev/null
+
+# ---------------------------------------------------------------------------
+# 6b. CardPaymentMethod (2) — payment methods on file for the insured
+# ---------------------------------------------------------------------------
+# Two illustrative payment methods so the runbook step 2.10 can show the
+# 'payment methods on file' view. Standard sObject CardPaymentMethod; the
+# schema requires an AccountId lookup (the insured Account) and does not
+# store real card numbers (masked/tokenized only).
+#
+# Fields used:
+#   AccountId          → the insured (Panadería La Espiga SAS)
+#   ProcessingMode     → External | ExternalRecurring | Salesforce
+#   Status             → Active | Inactive | New
+#   CardCategory       → CreditCard | DebitCard
+#   CardType           → Visa | MasterCard | Amex | Discover | Other
+#   CardLastFour       → 4-char tokenized suffix (safe to display)
+#   CardHolderName     → free text
+#   ExpiryMonth / ExpiryYear
+#
+# If the CardPaymentMethod object is not enabled in the org (requires
+# Salesforce Payments / Commerce license), this section is skipped with a
+# warning rather than failing the whole script — Block 2 renewal + cancel
+# already provide enough content for step 2.10 to reference conceptually.
+log "===== [6b] CardPaymentMethod (2) ====="
+
+if $SF sobject describe --sobject CardPaymentMethod --target-org "$ORG_ALIAS" --json >/dev/null 2>&1; then
+  ensure "CardPaymentMethod" \
+    "SELECT Id FROM CardPaymentMethod WHERE AccountId='$ACC_PANADERIA_ID' AND CardLastFour='4242' LIMIT 1" \
+    "AccountId=$ACC_PANADERIA_ID ProcessingMode=ExternalRecurring Status=Active CardCategory=CreditCard CardType=Visa CardLastFour=4242 CardHolderName='Panadería La Espiga SAS' ExpiryMonth=12 ExpiryYear=2028 Nickname='Corporate Visa'" \
+    "CardPaymentMethod Visa **** 4242" >/dev/null
+
+  ensure "CardPaymentMethod" \
+    "SELECT Id FROM CardPaymentMethod WHERE AccountId='$ACC_PANADERIA_ID' AND CardLastFour='5555' LIMIT 1" \
+    "AccountId=$ACC_PANADERIA_ID ProcessingMode=ExternalRecurring Status=Active CardCategory=DebitCard CardType=MasterCard CardLastFour=5555 CardHolderName='Panadería La Espiga SAS' ExpiryMonth=6 ExpiryYear=2027 Nickname='Backup Mastercard'" \
+    "CardPaymentMethod Mastercard **** 5555" >/dev/null
+else
+  warn "CardPaymentMethod sObject is not enabled on this org — skipping payment methods."
+  warn "The runbook step 2.10 will be presented conceptually instead of showing records."
+fi
+
 # ---------------------------------------------------------------------------
 # 7. InsurancePolicyProductClause (6) — materialization on the policy
 # ---------------------------------------------------------------------------
@@ -307,8 +368,8 @@ count_cla=$(soql_one "SELECT COUNT(Id) c FROM InsurancePolicyProductClause WHERE
 
 log "Policy POL-PYME-2026-0001: coverages=$count_cov transactions=$count_txn clauses=$count_cla"
 
-if [ "$count_cov" != "6" ] || [ "$count_txn" != "2" ] || [ "$count_cla" != "6" ]; then
-  warn "Counts don't match the expected values (6/2/6). Review the output above."
+if [ "$count_cov" != "6" ] || [ "$count_txn" != "4" ] || [ "$count_cla" != "6" ]; then
+  warn "Counts don't match the expected values (6/4/6). Review the output above."
 fi
 
 log "Block 2 — data is ready. URL:"

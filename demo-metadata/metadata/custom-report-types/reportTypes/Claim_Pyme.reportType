@@ -3,7 +3,7 @@
     <baseObject>Claim</baseObject>
     <category>other</category>
     <deployed>true</deployed>
-    <description>CRT ALFA Pyme para Claim</description>
+    <description>ALFA Pyme CRT for Claim — exposes status, loss dates and paid/reserved amounts.</description>
     <label>Siniestros Pyme</label>
     <sections>
         <columns>
@@ -14,6 +14,46 @@
         <columns>
             <checkedByDefault>true</checkedByDefault>
             <field>Name</field>
+            <table>Claim</table>
+        </columns>
+        <columns>
+            <checkedByDefault>true</checkedByDefault>
+            <field>Status</field>
+            <table>Claim</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>ClaimType</field>
+            <table>Claim</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>LossType</field>
+            <table>Claim</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>ClaimReason</field>
+            <table>Claim</table>
+        </columns>
+        <columns>
+            <checkedByDefault>true</checkedByDefault>
+            <field>InitialLossDate</field>
+            <table>Claim</table>
+        </columns>
+        <columns>
+            <checkedByDefault>true</checkedByDefault>
+            <field>TotalPaidAmount</field>
+            <table>Claim</table>
+        </columns>
+        <columns>
+            <checkedByDefault>true</checkedByDefault>
+            <field>TotalReserveAmount</field>
+            <table>Claim</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>PolicyId</field>
             <table>Claim</table>
         </columns>
         <masterLabel>Siniestros Pyme</masterLabel>
