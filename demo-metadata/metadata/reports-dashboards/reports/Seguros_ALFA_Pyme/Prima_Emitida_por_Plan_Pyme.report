@@ -11,7 +11,6 @@
         </chartSummaries>
         <chartType>HorizontalBar</chartType>
         <groupingColumn>InsurancePolicy$PolicyType</groupingColumn>
-        <legendPosition>Right</legendPosition>
         <location>CHART_BOTTOM</location>
         <size>Medium</size>
         <summaryAxisRange>Auto</summaryAxisRange>

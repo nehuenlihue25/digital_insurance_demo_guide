@@ -49,6 +49,14 @@ echo "=============================================================="
 echo " Block 6 - Deploy Reports & Dashboards (MDAPI via SOAP)"
 echo "=============================================================="
 
+# Target org: accept alias as first positional arg, else ORG_ALIAS env var, else default alias set on sf CLI.
+TARGET_ORG="${1:-${ORG_ALIAS:-}}"
+if [[ -n "${TARGET_ORG}" ]]; then
+  echo "[config] TARGET_ORG=${TARGET_ORG}"
+else
+  echo "[config] TARGET_ORG=(default alias)"
+fi
+
 # -----------------------------------------------------------------------------
 # Prerequisites
 # -----------------------------------------------------------------------------
@@ -71,16 +79,18 @@ done
 # Access token + instance URL (sf org display --verbose)
 # -----------------------------------------------------------------------------
 echo ""
-echo "[auth] Fetching accessToken and instanceUrl via 'sf org display'..."
-ORG_JSON="$(sf org display --json --verbose 2>/dev/null || true)"
-if [[ -z "${ORG_JSON}" ]]; then
-  echo "ERROR: 'sf org display --json --verbose' returned nothing." >&2
-  echo "       Make sure you have an authenticated target-org." >&2
-  exit 1
+echo "[auth] Fetching accessToken and instanceUrl..."
+# Recent sf CLI versions redact accessToken in `sf org display --json` output
+# unless SF_TEMP_SHOW_SECRETS=true is set (or you use `sf org auth show-access-token`
+# on newer builds). We try `sf org auth show-access-token` first (no env var,
+# cleanest), and fall back to the SF_TEMP_SHOW_SECRETS path for older CLIs.
+ACCESS_TOKEN="$(SF_DISABLE_LOG_FILE=true sf org auth show-access-token --target-org "${TARGET_ORG:-}" 2>/dev/null | tail -n1 || true)"
+if [[ -z "${ACCESS_TOKEN}" ]] || [[ "${ACCESS_TOKEN}" != 00D* ]]; then
+  ORG_JSON="$(SF_TEMP_SHOW_SECRETS=true sf org display --json --verbose ${TARGET_ORG:+--target-org "$TARGET_ORG"} 2>/dev/null || true)"
+  ACCESS_TOKEN="$(printf '%s' "${ORG_JSON}" | python3 -c 'import sys,json;d=json.load(sys.stdin);print(d["result"]["accessToken"])' 2>/dev/null || true)"
 fi
-
-ACCESS_TOKEN="$(printf '%s' "${ORG_JSON}" | python3 -c 'import sys,json;d=json.load(sys.stdin);print(d["result"]["accessToken"])')"
-INSTANCE_URL="$(printf '%s' "${ORG_JSON}" | python3 -c 'import sys,json;d=json.load(sys.stdin);print(d["result"]["instanceUrl"])')"
+ORG_JSON="$(SF_DISABLE_LOG_FILE=true sf org display --json ${TARGET_ORG:+--target-org "$TARGET_ORG"} 2>/dev/null || true)"
+INSTANCE_URL="$(printf '%s' "${ORG_JSON}" | python3 -c 'import sys,json;d=json.load(sys.stdin);print(d["result"]["instanceUrl"])' 2>/dev/null || true)"
 
 if [[ -z "${ACCESS_TOKEN}" ]] || [[ -z "${INSTANCE_URL}" ]]; then
   echo "ERROR: could not extract accessToken/instanceUrl from JSON." >&2
@@ -100,7 +110,7 @@ echo "[step 1] Creating '${FOLDER_NAME}' folders (Report + Dashboard) if they do
 ensure_folder() {
   local folder_type="$1"  # Report | Dashboard
   local existing
-  existing="$(sf data query \
+  existing="$(sf data query ${TARGET_ORG:+--target-org "$TARGET_ORG"} \
     --query "SELECT Id FROM Folder WHERE DeveloperName='${FOLDER_DEV_NAME}' AND Type='${folder_type}' LIMIT 1" \
     --json 2>/dev/null | \
     python3 -c 'import sys,json;d=json.load(sys.stdin);r=d.get("result",{}).get("records",[]);print(r[0]["Id"] if r else "")')"
@@ -111,7 +121,7 @@ ensure_folder() {
   fi
 
   echo "[step 1]   Creating Folder ${folder_type}..."
-  sf data create record --sobject Folder \
+  sf data create record --sobject Folder ${TARGET_ORG:+--target-org "$TARGET_ORG"} \
     --values "Name='${FOLDER_NAME}' DeveloperName=${FOLDER_DEV_NAME} Type=${folder_type} AccessType=Public" \
     >/dev/null
   echo "[step 1]   Folder ${folder_type} created."
@@ -323,12 +333,12 @@ sleep 10
 echo ""
 echo "[step 6] Verifying counts in folder '${FOLDER_DEV_NAME}'..."
 
-REPORT_COUNT="$(sf data query \
+REPORT_COUNT="$(sf data query ${TARGET_ORG:+--target-org "$TARGET_ORG"} \
   --query "SELECT COUNT(Id) c FROM Report WHERE FolderName='${FOLDER_NAME}'" \
   --json 2>/dev/null | \
   python3 -c 'import sys,json;d=json.load(sys.stdin);print(d["result"]["records"][0]["c"])')"
 
-DASHBOARD_COUNT="$(sf data query \
+DASHBOARD_COUNT="$(sf data query ${TARGET_ORG:+--target-org "$TARGET_ORG"} \
   --query "SELECT COUNT(Id) c FROM Dashboard WHERE FolderName='${FOLDER_NAME}'" \
   --json 2>/dev/null | \
   python3 -c 'import sys,json;d=json.load(sys.stdin);print(d["result"]["records"][0]["c"])')"

@@ -10,8 +10,7 @@
             <column>InsurancePolicyCoverage$TermPremiumAmount</column>
         </chartSummaries>
         <chartType>HorizontalBar</chartType>
-        <groupingColumn>InsurancePolicyCoverage$ProductId</groupingColumn>
-        <legendPosition>Right</legendPosition>
+        <groupingColumn>InsurancePolicyCoverage$CoverageCode</groupingColumn>
         <location>CHART_BOTTOM</location>
         <size>Medium</size>
         <summaryAxisRange>Auto</summaryAxisRange>
@@ -25,16 +24,13 @@
         <field>InsurancePolicyCoverage$Name</field>
     </columns>
     <columns>
-        <field>InsurancePolicyCoverage$CoverageCode</field>
-    </columns>
-    <columns>
         <field>InsurancePolicyCoverage$TermPremiumAmount</field>
         <aggregateTypes>Sum</aggregateTypes>
     </columns>
     <format>Summary</format>
     <groupingsDown>
         <dateGranularity>Day</dateGranularity>
-        <field>InsurancePolicyCoverage$ProductId</field>
+        <field>InsurancePolicyCoverage$CoverageCode</field>
         <sortOrder>Asc</sortOrder>
     </groupingsDown>
     <name>Coberturas Activas Pyme por Tipo</name>

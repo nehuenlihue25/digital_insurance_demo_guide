@@ -7,11 +7,10 @@
         <chartSummaries>
             <aggregate>Sum</aggregate>
             <axisBinding>y</axisBinding>
-            <column>ClaimCoveragePaymentDetail$ClaimedAmount</column>
+            <column>ClaimCoveragePaymentDetail$AdjustedAmount</column>
         </chartSummaries>
         <chartType>HorizontalBar</chartType>
         <groupingColumn>ClaimCoveragePaymentDetail$PaymentStatus</groupingColumn>
-        <legendPosition>Right</legendPosition>
         <location>CHART_BOTTOM</location>
         <size>Medium</size>
         <summaryAxisRange>Auto</summaryAxisRange>
@@ -28,7 +27,7 @@
         <field>ClaimCoveragePaymentDetail$Type</field>
     </columns>
     <columns>
-        <field>ClaimCoveragePaymentDetail$ClaimedAmount</field>
+        <field>ClaimCoveragePaymentDetail$AdjustedAmount</field>
         <aggregateTypes>Sum</aggregateTypes>
     </columns>
     <format>Summary</format>

@@ -4,9 +4,13 @@
         <backgroundColor1>#FFFFFF</backgroundColor1>
         <backgroundColor2>#FFFFFF</backgroundColor2>
         <backgroundFadeDir>Diagonal</backgroundFadeDir>
+        <chartSummaries>
+            <aggregate>Sum</aggregate>
+            <axisBinding>y</axisBinding>
+            <column>InsurancePolicy$TermPremiumAmount</column>
+        </chartSummaries>
         <chartType>HorizontalBar</chartType>
         <groupingColumn>InsurancePolicy$Status</groupingColumn>
-        <legendPosition>Right</legendPosition>
         <location>CHART_BOTTOM</location>
         <size>Medium</size>
         <summaryAxisRange>Auto</summaryAxisRange>

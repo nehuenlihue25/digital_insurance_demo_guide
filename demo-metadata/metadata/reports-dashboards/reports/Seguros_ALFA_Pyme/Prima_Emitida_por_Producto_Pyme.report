@@ -10,8 +10,7 @@
             <column>InsurancePolicy$TermPremiumAmount</column>
         </chartSummaries>
         <chartType>HorizontalBar</chartType>
-        <groupingColumn>InsurancePolicy$ProductId</groupingColumn>
-        <legendPosition>Right</legendPosition>
+        <groupingColumn>InsurancePolicy$PolicyType</groupingColumn>
         <location>CHART_BOTTOM</location>
         <size>Medium</size>
         <summaryAxisRange>Auto</summaryAxisRange>
@@ -34,7 +33,7 @@
     <format>Summary</format>
     <groupingsDown>
         <dateGranularity>Day</dateGranularity>
-        <field>InsurancePolicy$ProductId</field>
+        <field>InsurancePolicy$PolicyType</field>
         <sortOrder>Asc</sortOrder>
     </groupingsDown>
     <name>Prima Emitida por Producto Pyme</name>

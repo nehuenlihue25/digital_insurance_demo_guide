@@ -26,16 +26,6 @@
             <field>AdjustmentReason</field>
             <table>ClaimCovReserveAdjustment</table>
         </columns>
-        <columns>
-            <checkedByDefault>false</checkedByDefault>
-            <field>ClaimCoverageReserveDetailId</field>
-            <table>ClaimCovReserveAdjustment</table>
-        </columns>
-        <columns>
-            <checkedByDefault>false</checkedByDefault>
-            <field>ClaimCoverageId</field>
-            <table>ClaimCovReserveAdjustment</table>
-        </columns>
         <masterLabel>Reservas Siniestros Pyme</masterLabel>
     </sections>
 </ReportType>

@@ -16,9 +16,9 @@
         <field>Claim$EstimatedAmount</field>
     </columns>
     <format>Tabular</format>
-    <name>Loss Ratio Pyme (Pagado y Reservado por Siniestro)</name>
+    <name>Loss Ratio Pyme</name>
     <reportType>Claim_Pyme__c</reportType>
-    <rowLimit>100</rowLimit>
+    <rowLimit>25</rowLimit>
     <scope>organization</scope>
     <showDetails>true</showDetails>
     <showGrandTotal>true</showGrandTotal>

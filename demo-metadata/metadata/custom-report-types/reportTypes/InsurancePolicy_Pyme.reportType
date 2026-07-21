@@ -61,21 +61,6 @@
             <field>TotalSumInsured</field>
             <table>InsurancePolicy</table>
         </columns>
-        <columns>
-            <checkedByDefault>false</checkedByDefault>
-            <field>NameInsuredId</field>
-            <table>InsurancePolicy</table>
-        </columns>
-        <columns>
-            <checkedByDefault>false</checkedByDefault>
-            <field>ProductId</field>
-            <table>InsurancePolicy</table>
-        </columns>
-        <columns>
-            <checkedByDefault>false</checkedByDefault>
-            <field>PriorPolicyId</field>
-            <table>InsurancePolicy</table>
-        </columns>
         <masterLabel>Polizas Pyme</masterLabel>
     </sections>
 </ReportType>

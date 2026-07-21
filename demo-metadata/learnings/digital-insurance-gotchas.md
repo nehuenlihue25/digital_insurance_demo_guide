@@ -62,6 +62,26 @@ Verified via `sf sobject describe` against a live FINS QBranch IDO (release 262 
 
 **How to avoid this trap**: BEFORE writing any CRT XML, run `sf sobject describe --sobject <name> --json | jq '.result.fields[] | select(.name | test("<pattern>")) | .name'` to enumerate the actual field names. Do not trust docs or memory. If you're building a report/CRT that references a field, also run `sf data query --query "SELECT <field> FROM <sobj> LIMIT 1"` — that's the smoke test that reveals fields hidden by profile permission or org edition mismatches.
 
+### Reference/lookup fields — SOQL says OK but CRT rejects them
+
+**Lookup (reference) fields cannot be declared as `<columns>` inside a Custom Report Type via MDAPI**, even though SOQL happily selects them. Salesforce rejects with `Could not find field XxxId in table <ObjectLabel>` at CRT deploy time. Examples caught this way: `Claim.PolicyNumberId`, `ClaimCoveragePaymentDetail.ClaimCoverageId`, `ClaimCovReserveAdjustment.ClaimCoverageReserveDetailId`, `InsurancePolicy.NameInsuredId` / `ProductId` / `PriorPolicyId`, `InsurancePolicyCoverage.InsurancePolicyId` / `ProductId`.
+
+To include parent-object data in a CRT report, use a `<sections>` join with the parent object rather than a `<columns>` entry with the FK. For the ALFA demo we simply removed the lookup FKs from the CRTs — the dashboards didn't need them as groupings.
+
+### Reports metadata — additional validation traps caught at deploy
+
+Deploying the reports revealed 4 more MDAPI rules that the SOQL smoke test cannot catch:
+
+- **`<legendPosition>`**: values `Right` and `Bottom` are rejected in API v62 for HorizontalBar charts (both throw "Invalid value specified"). The safest fix is to **omit the element entirely** and let Salesforce pick a default.
+- **`<rowLimit>` on Tabular reports**: only `10` and `25` are accepted values. `100` fails with "invalid row limit". If you need more, switch to Summary format.
+- **Repeating a grouping column in `<columns>`**: throws "You can't include groupings in the selected columns list". Remove the field from `<columns>` if it already appears in `<groupingsDown>`.
+- **Report `<name>` max 40 characters**: longer names fail with "Value too long for field: Name maximum length is:40". Save descriptive language for `<description>`.
+- **`<chartSummaries>` required on Summary reports with a chart**: even for a row-count-style chart, you must declare at least one `<chartSummaries>` block referencing a Summary column (`Sum`, `Average`, etc.). Otherwise: "Required field is missing: chartSummaries".
+
+### Access token retrieval after v66+
+
+Recent CLI versions redact `accessToken` in `sf org display --json` output. Use `sf org auth show-access-token --target-org <alias>` on new builds; on older ones set `SF_TEMP_SHOW_SECRETS=true` before `sf org display --json --verbose`. Both are shown in `05-block6-deploy-reports.sh`.
+
 ## 7. PADs are NOT auto-generated
 
 Setting `Product2.BasedOnId = <ProductClassificationId>` does NOT trigger automatic creation of `ProductAttributeDefinition` records from that classification's `ProductClassificationAttr` records. You have to create them manually:

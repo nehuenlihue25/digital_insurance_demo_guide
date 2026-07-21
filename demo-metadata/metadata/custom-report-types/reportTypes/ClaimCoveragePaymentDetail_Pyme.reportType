@@ -51,11 +51,6 @@
             <field>ScheduledPaymentDate</field>
             <table>ClaimCoveragePaymentDetail</table>
         </columns>
-        <columns>
-            <checkedByDefault>false</checkedByDefault>
-            <field>ClaimCoverageId</field>
-            <table>ClaimCoveragePaymentDetail</table>
-        </columns>
         <masterLabel>Pagos Siniestros Pyme</masterLabel>
     </sections>
 </ReportType>

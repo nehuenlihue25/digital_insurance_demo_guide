@@ -21,7 +21,7 @@
     <format>Tabular</format>
     <name>Total Prima Emitida Pyme</name>
     <reportType>InsurancePolicy_Pyme__c</reportType>
-    <rowLimit>100</rowLimit>
+    <rowLimit>25</rowLimit>
     <scope>organization</scope>
     <showDetails>true</showDetails>
     <showGrandTotal>true</showGrandTotal>
