@@ -33,7 +33,17 @@
         </columns>
         <columns>
             <checkedByDefault>true</checkedByDefault>
-            <field>PaymentAmount</field>
+            <field>ClaimedAmount</field>
+            <table>ClaimCoveragePaymentDetail</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>AdjustedAmount</field>
+            <table>ClaimCoveragePaymentDetail</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>ActualExpense</field>
             <table>ClaimCoveragePaymentDetail</table>
         </columns>
         <columns>

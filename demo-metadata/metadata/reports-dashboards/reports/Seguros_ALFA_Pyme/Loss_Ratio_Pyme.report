@@ -7,13 +7,13 @@
         <field>Claim$Status</field>
     </columns>
     <columns>
-        <field>Claim$InitialLossDate</field>
+        <field>Claim$LossDate</field>
     </columns>
     <columns>
-        <field>Claim$TotalPaidAmount</field>
+        <field>Claim$ActualAmount</field>
     </columns>
     <columns>
-        <field>Claim$TotalReserveAmount</field>
+        <field>Claim$EstimatedAmount</field>
     </columns>
     <format>Tabular</format>
     <name>Loss Ratio Pyme (Pagado y Reservado por Siniestro)</name>
@@ -23,6 +23,6 @@
     <showDetails>true</showDetails>
     <showGrandTotal>true</showGrandTotal>
     <showSubTotals>true</showSubTotals>
-    <sortColumn>Claim$TotalPaidAmount</sortColumn>
+    <sortColumn>Claim$ActualAmount</sortColumn>
     <sortOrder>Desc</sortOrder>
 </Report>

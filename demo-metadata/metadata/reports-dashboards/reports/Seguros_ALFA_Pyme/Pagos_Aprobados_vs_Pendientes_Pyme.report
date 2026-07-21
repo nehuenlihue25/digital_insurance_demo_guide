@@ -7,7 +7,7 @@
         <chartSummaries>
             <aggregate>Sum</aggregate>
             <axisBinding>y</axisBinding>
-            <column>ClaimCoveragePaymentDetail$PaymentAmount</column>
+            <column>ClaimCoveragePaymentDetail$ClaimedAmount</column>
         </chartSummaries>
         <chartType>HorizontalBar</chartType>
         <groupingColumn>ClaimCoveragePaymentDetail$PaymentStatus</groupingColumn>
@@ -28,7 +28,7 @@
         <field>ClaimCoveragePaymentDetail$Type</field>
     </columns>
     <columns>
-        <field>ClaimCoveragePaymentDetail$PaymentAmount</field>
+        <field>ClaimCoveragePaymentDetail$ClaimedAmount</field>
         <aggregateTypes>Sum</aggregateTypes>
     </columns>
     <format>Summary</format>

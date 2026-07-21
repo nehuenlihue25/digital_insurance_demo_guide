@@ -20,10 +20,10 @@
         <field>Claim$Name</field>
     </columns>
     <columns>
-        <field>Claim$InitialLossDate</field>
+        <field>Claim$LossDate</field>
     </columns>
     <columns>
-        <field>Claim$TotalPaidAmount</field>
+        <field>Claim$ActualAmount</field>
         <aggregateTypes>Sum</aggregateTypes>
     </columns>
     <format>Summary</format>

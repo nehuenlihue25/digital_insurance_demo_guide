@@ -16,7 +16,7 @@
         <field>InsurancePolicy$ExpirationDate</field>
     </columns>
     <columns>
-        <field>InsurancePolicy$TermPremium</field>
+        <field>InsurancePolicy$TermPremiumAmount</field>
     </columns>
     <format>Tabular</format>
     <name>Total Prima Emitida Pyme</name>
@@ -26,6 +26,6 @@
     <showDetails>true</showDetails>
     <showGrandTotal>true</showGrandTotal>
     <showSubTotals>true</showSubTotals>
-    <sortColumn>InsurancePolicy$TermPremium</sortColumn>
+    <sortColumn>InsurancePolicy$TermPremiumAmount</sortColumn>
     <sortOrder>Desc</sortOrder>
 </Report>

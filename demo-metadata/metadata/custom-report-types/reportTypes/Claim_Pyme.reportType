@@ -38,22 +38,37 @@
         </columns>
         <columns>
             <checkedByDefault>true</checkedByDefault>
-            <field>InitialLossDate</field>
-            <table>Claim</table>
-        </columns>
-        <columns>
-            <checkedByDefault>true</checkedByDefault>
-            <field>TotalPaidAmount</field>
-            <table>Claim</table>
-        </columns>
-        <columns>
-            <checkedByDefault>true</checkedByDefault>
-            <field>TotalReserveAmount</field>
+            <field>LossDate</field>
             <table>Claim</table>
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
-            <field>PolicyId</field>
+            <field>ClaimLossDate</field>
+            <table>Claim</table>
+        </columns>
+        <columns>
+            <checkedByDefault>true</checkedByDefault>
+            <field>ActualAmount</field>
+            <table>Claim</table>
+        </columns>
+        <columns>
+            <checkedByDefault>true</checkedByDefault>
+            <field>EstimatedAmount</field>
+            <table>Claim</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>ApprovedAmount</field>
+            <table>Claim</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>TotalClaimedAmount</field>
+            <table>Claim</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>PolicyNumberId</field>
             <table>Claim</table>
         </columns>
         <masterLabel>Siniestros Pyme</masterLabel>

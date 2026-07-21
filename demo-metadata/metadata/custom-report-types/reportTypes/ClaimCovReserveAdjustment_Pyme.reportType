@@ -22,13 +22,13 @@
             <table>ClaimCovReserveAdjustment</table>
         </columns>
         <columns>
-            <checkedByDefault>false</checkedByDefault>
-            <field>ReserveType</field>
+            <checkedByDefault>true</checkedByDefault>
+            <field>AdjustmentReason</field>
             <table>ClaimCovReserveAdjustment</table>
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
-            <field>AdjustmentDate</field>
+            <field>ClaimCoverageReserveDetailId</field>
             <table>ClaimCovReserveAdjustment</table>
         </columns>
         <columns>

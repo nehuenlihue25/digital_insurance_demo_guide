@@ -23,7 +23,7 @@
         <field>InsurancePolicy$PolicyType</field>
     </columns>
     <columns>
-        <field>InsurancePolicy$TermPremium</field>
+        <field>InsurancePolicy$TermPremiumAmount</field>
         <aggregateTypes>Sum</aggregateTypes>
     </columns>
     <format>Summary</format>

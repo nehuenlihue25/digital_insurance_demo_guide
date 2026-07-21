@@ -7,7 +7,7 @@
         <chartSummaries>
             <aggregate>Sum</aggregate>
             <axisBinding>y</axisBinding>
-            <column>InsurancePolicy$TermPremium</column>
+            <column>InsurancePolicy$TermPremiumAmount</column>
         </chartSummaries>
         <chartType>HorizontalBar</chartType>
         <groupingColumn>InsurancePolicy$PolicyType</groupingColumn>
@@ -28,7 +28,7 @@
         <field>InsurancePolicy$Status</field>
     </columns>
     <columns>
-        <field>InsurancePolicy$TermPremium</field>
+        <field>InsurancePolicy$TermPremiumAmount</field>
         <aggregateTypes>Sum</aggregateTypes>
     </columns>
     <format>Summary</format>

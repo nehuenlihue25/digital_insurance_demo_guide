@@ -48,7 +48,7 @@
         </columns>
         <columns>
             <checkedByDefault>true</checkedByDefault>
-            <field>TermPremium</field>
+            <field>TermPremiumAmount</field>
             <table>InsurancePolicy</table>
         </columns>
         <columns>

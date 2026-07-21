@@ -18,17 +18,17 @@
         </columns>
         <columns>
             <checkedByDefault>true</checkedByDefault>
-            <field>Status</field>
-            <table>InsurancePolicyCoverage</table>
-        </columns>
-        <columns>
-            <checkedByDefault>true</checkedByDefault>
             <field>InsurancePolicyId</field>
             <table>InsurancePolicyCoverage</table>
         </columns>
         <columns>
+            <checkedByDefault>true</checkedByDefault>
+            <field>ProductId</field>
+            <table>InsurancePolicyCoverage</table>
+        </columns>
+        <columns>
             <checkedByDefault>false</checkedByDefault>
-            <field>Product2Id</field>
+            <field>CoverageCode</field>
             <table>InsurancePolicyCoverage</table>
         </columns>
         <columns>
@@ -53,12 +53,22 @@
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
-            <field>TotalTermPremiumAmount</field>
+            <field>PremiumAmount</field>
             <table>InsurancePolicyCoverage</table>
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
-            <field>GrossWrittenPremium</field>
+            <field>TotalTermAmount</field>
+            <table>InsurancePolicyCoverage</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>LimitAmount</field>
+            <table>InsurancePolicyCoverage</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>DeductibleAmount</field>
             <table>InsurancePolicyCoverage</table>
         </columns>
         <masterLabel>Coberturas Pyme</masterLabel>

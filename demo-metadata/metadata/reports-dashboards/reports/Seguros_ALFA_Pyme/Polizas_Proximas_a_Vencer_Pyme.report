@@ -13,7 +13,7 @@
         <field>InsurancePolicy$ExpirationDate</field>
     </columns>
     <columns>
-        <field>InsurancePolicy$TermPremium</field>
+        <field>InsurancePolicy$TermPremiumAmount</field>
     </columns>
     <format>Tabular</format>
     <name>Polizas Pyme Proximas a Vencer 90 Dias</name>

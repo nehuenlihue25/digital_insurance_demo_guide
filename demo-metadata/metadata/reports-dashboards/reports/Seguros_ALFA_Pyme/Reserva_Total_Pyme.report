@@ -10,7 +10,7 @@
             <column>ClaimCovReserveAdjustment$AdjustmentAmount</column>
         </chartSummaries>
         <chartType>HorizontalBar</chartType>
-        <groupingColumn>ClaimCovReserveAdjustment$ReserveType</groupingColumn>
+        <groupingColumn>ClaimCovReserveAdjustment$AdjustmentReason</groupingColumn>
         <legendPosition>Right</legendPosition>
         <location>CHART_BOTTOM</location>
         <size>Medium</size>
@@ -31,7 +31,7 @@
     <format>Summary</format>
     <groupingsDown>
         <dateGranularity>Day</dateGranularity>
-        <field>ClaimCovReserveAdjustment$ReserveType</field>
+        <field>ClaimCovReserveAdjustment$AdjustmentReason</field>
         <sortOrder>Asc</sortOrder>
     </groupingsDown>
     <name>Reserva Total Constituida Pyme</name>
