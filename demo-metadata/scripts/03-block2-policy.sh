@@ -13,9 +13,20 @@
 #   - 6 InsurancePolicyCoverage records (RC, Incendio, Equipo, Robo, Rotura,
 #     Sustracción) dynamically linked to the Simple Product2s created by
 #     script 02
-#   - 2 InsurancePolicyTransaction records (Issuance + Endorsement)
+#   - 4 InsurancePolicyTransaction records:
+#       - Issuance (Type='Premium Payment', Category=Issuance)
+#       - Endorsement 001 on Incendio coverage (Type=Endorsement)
+#       - Renewal 2027 (Type=Renewal, premium adjusted +5% for inflation)
+#       - Cancellation Request (Type=Cancellation, negative amount = pro-rated
+#         refund; Status='In Process' so the demo can show the workflow moment.
+#         The Policy itself is left In Force so the rest of Block 2 and Block 3
+#         still work.)
 #   - 6 InsurancePolicyProductClause records materialized from the
 #     InsuranceProductClause rows created by script 02 (5 AutoAdded + 1 Manual)
+#   - 2 CardPaymentMethod records (Visa ****4242 + Mastercard ****5555)
+#     tied to the Panadería Account. Gated on the CardPaymentMethod sObject
+#     being enabled in the org (Salesforce Payments PSL); skipped with a
+#     warning if not, so the script never fails on this piece.
 #
 # Cross-script rules:
 #   - Prefix SF_DISABLE_LOG_FILE=true (sandbox — see learnings/sf-cli-…)

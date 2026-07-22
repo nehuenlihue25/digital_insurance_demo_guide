@@ -32,7 +32,7 @@ demo-metadata/
 │   ├── 00-prerequisites.sh      ← verify org + PSLs + PS
 │   ├── 01-block1-product.sh    ← create catalog + product + coverages + attrs
 │   ├── 02-block5-clauses.sh    ← create InsuranceClauses + productClauses + variableMaps
-│   ├── 03-block2-policy.sh     ← accounts + policy + coverages + transactions + policy clauses
+│   ├── 03-block2-policy.sh     ← accounts + policy + coverages + 4 IPTs (issuance/endorsement/renewal/cancellation) + policy clauses + 2 CardPaymentMethods
 │   ├── 04-block3-claim.sh      ← claim + participants + items + coverage + reserves + payments
 │   └── 05-block6-deploy-reports.sh ← deploy reports+dashboards via SOAP MDAPI
 ├── metadata/

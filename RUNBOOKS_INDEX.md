@@ -34,7 +34,7 @@ Recommended order for Wednesday night, 2026-07-08:
 | 8:00 - 8:15 | 15 min | Opening | Introductions, context, scope of the presentation, what's covered and what isn't | This file |
 | 8:15 - 8:45 | 30 min | **Block 1** | Modular, plan-based SMB product configuration | `RUNBOOK_BLOCK1_PYME_PRODUCT.md` |
 | 8:45 - 8:50 | 5 min | Transition | Quick product questions, transition to policy | — |
-| 8:50 - 9:20 | 30 min | **Block 2** | Full policy lifecycle (includes clauses — original Block 5) | `RUNBOOK_BLOCK2_POLICY_LIFECYCLE.md` |
+| 8:50 - 9:35 | 45 min | **Block 2** | Full policy lifecycle (issuance, endorsement, renewal, cancellation, payment methods, clauses) + architecture for cobranza/reintegros/archivos bancarios | `RUNBOOK_BLOCK2_POLICY_LIFECYCLE.md` |
 | 9:20 - 9:35 | 15 min | Coffee break | — | — |
 | 9:35 - 10:20 | 45 min | **Block 3** | Full claims lifecycle | `RUNBOOK_BLOCK3_CLAIMS.md` |
 | 10:20 - 10:30 | 10 min | Transition | Close claims, start reporting | — |
@@ -81,9 +81,9 @@ Recommended order for Wednesday night, 2026-07-08:
 - [ ] Click **Policy Structure** — tree Policy → 6 Coverages.
 - [ ] Click **Related** — confirm Coverages appear (Transactions and Clauses do NOT appear here — this is the known gotcha).
 - [ ] Pre-open in background tabs:
-  - `/lightning/o/InsurancePolicyTransaction/list?filterName=Recent` (to show the 2 transactions via list view)
+  - `/lightning/o/InsurancePolicyTransaction/list?filterName=Recent` (to show the 4 transactions via list view — issuance, endorsement, renewal, cancellation)
   - `/lightning/o/InsurancePolicyProductClause/list?filterName=Recent` (to show the 6 clauses)
-- [ ] Alternative: open the 2 transactions and 6 clauses directly in pre-loaded tabs.
+- [ ] Alternative: open the 4 transactions and 6 clauses directly in pre-loaded tabs.
 
 **Block 3 — Claim:**
 - [ ] Open /lightning/r/Claim/0Zkg80000000awLCAQ/view — SIN-PYME-2026-0001.
@@ -235,7 +235,7 @@ The 4 runbooks are the literal step-by-step guide to executing each block. Luis 
 | File | Block | Duration | 1-liner |
 |------|-------|----------|---------|
 | `RUNBOOK_BLOCK1_PYME_PRODUCT.md` | Block 1 — Product | 30 min | How to show Plan Empresarial (Bundle) with 6 Simple coverages, 8 attributes, 2 ProductClassifications, and 2 ProductComponentGroups; canonical path App Launcher → Product Catalog Management → Products → Plan Empresarial → Structure tab. |
-| `RUNBOOK_BLOCK2_POLICY_LIFECYCLE.md` | Block 2 — Policy | 30 min | How to show POL-PYME-2026-0001 with its 6 coverages, 2 transactions (Issuance + Endorsement), 6 clauses (5 auto + 1 manual Coaseguro 10%); includes workaround so Transactions and Clauses are visible despite the default layout not exposing them. |
+| `RUNBOOK_BLOCK2_POLICY_LIFECYCLE.md` | Block 2 — Policy | 45 min | How to show POL-PYME-2026-0001 with its 6 coverages, 4 transactions (Issuance + Endorsement + Renewal 2027 + Cancellation Request), 6 clauses (5 auto + 1 manual Coaseguro 10%), and 2 CardPaymentMethods on file. Includes section 5 with the architecture for recurring collection scheduling, retry logic, integration and bank file generation (the pieces beyond native Digital Insurance). Also includes a workaround so Transactions and Clauses are visible despite the default layout not exposing them. |
 | `RUNBOOK_BLOCK3_CLAIMS.md` | Block 3 — Claim | 45 min | How to show SIN-PYME-2026-0001 with 3 participants, 3 items, 1 ClaimCoverage with 50MM reserves, 2 payment details (32MM Paid + 8MM Pending Authority), and ClaimPaymentSummary in Pending Payment. |
 | `RUNBOOK_BLOCK6_REPORTING.md` | Block 6 — Reporting | 30 min | How to show the 3 dashboards (Producción / Renovaciones / Siniestralidad Pyme 2026) and the 11 reports in the "Seguros ALFA Pyme" folder; which report closes the claims narrative connecting to Block 3. |
 

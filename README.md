@@ -73,7 +73,7 @@ If all three commands succeed, you're ready for the **Quick start** below.
 - **[SPEC_PYME_INTEGRAL_BLOCK1.md](SPEC_PYME_INTEGRAL_BLOCK1.md)** — technical spec for the Pyme product (bundle + coverages + attributes + classifications), with a teardown of Auto Gold as the reference implementation
 - **[RUNBOOKS_INDEX.md](RUNBOOKS_INDEX.md)** — master pre-demo checklist + day-of agenda + Q&A guide
 - **[RUNBOOK_BLOCK1_PYME_PRODUCT.md](RUNBOOK_BLOCK1_PYME_PRODUCT.md)** — Block 1 (48 min): Product Catalog Management + Quote configuration LWC + Issue Policy — click-by-click with literal talk track
-- **[RUNBOOK_BLOCK2_POLICY_LIFECYCLE.md](RUNBOOK_BLOCK2_POLICY_LIFECYCLE.md)** — Block 2 (30 min): policy lifecycle, endorsement, clauses
+- **[RUNBOOK_BLOCK2_POLICY_LIFECYCLE.md](RUNBOOK_BLOCK2_POLICY_LIFECYCLE.md)** — Block 2 (45 min): policy lifecycle — issuance, endorsement, renewal, cancellation with pro-rated refund, clauses, payment methods on file, plus an architecture section covering recurring collection scheduling, retry logic, integration and bank file generation
 - **[RUNBOOK_BLOCK3_CLAIMS.md](RUNBOOK_BLOCK3_CLAIMS.md)** — Block 3 (45 min): end-to-end claims with reserves and payments
 - **[RUNBOOK_BLOCK6_REPORTING.md](RUNBOOK_BLOCK6_REPORTING.md)** — Block 6 (30 min): 3 dashboards + 11 Spanish-labeled reports
 
