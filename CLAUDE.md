@@ -85,3 +85,7 @@ Rules that SOQL smoke tests won't catch — the deploy fails with these:
 ## When researching Salesforce features
 
 Use the Salesforce Docs MCP (`salesforce_docs_search` + `salesforce_docs_fetch`) for current documentation. Prefer release 260+ docs. Use `search_mode="hybrid"` when querying for specific API names or error strings.
+
+## When working with OmniStudio (OmniScripts, DataRaptors, Integration Procedures, FlexCards)
+
+Block 1's Quote flow is backed by OmniScript `CreateQuoteDCT2` + DataRaptors. If the OmniStudio MCP is configured (see README section 2), Claude can introspect and modify these directly. If it isn't, generate its `.mcp.json` with `demo-metadata/scripts/setup-omnistudio-mcp.sh <alias>` and restart Claude Code — do NOT try to fix it by setting `sfcli: true`, the interactive `sf org auth show-access-token` confirmation will hang the MCP subprocess. Full write-up: `demo-metadata/learnings/omnistudio-mcp-setup.md`.

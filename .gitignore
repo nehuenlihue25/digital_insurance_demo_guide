@@ -11,6 +11,10 @@ scheduled_tasks.json
 .sfdx/
 .sf/
 
+# MCP config — contains injected SF_ACCESS_TOKEN, must never be committed.
+# Every user generates their own via demo-metadata/scripts/setup-omnistudio-mcp.sh
+.mcp.json
+
 # Temp files
 *.tmp
 *.swp

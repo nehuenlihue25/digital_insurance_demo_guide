@@ -40,7 +40,7 @@ From here on, **every `sf` command in the scripts and runbooks uses `--target-or
 
 ### 2. MCP servers for Claude Code
 
-Model Context Protocol (MCP) servers expose external tools to Claude Code so it can query docs, drive orgs, and read team channels without leaving the chat. Two are essential for this repo; a third is optional:
+Model Context Protocol (MCP) servers expose external tools to Claude Code so it can query docs, drive orgs, run OmniStudio components, and read team channels without leaving the chat. Three are essential for this repo; a fourth is optional:
 
 **Essential — Salesforce Docs MCP** — lets Claude search and fetch Salesforce Help + Developer Documentation directly. Every design/debug conversation in this repo used it (`salesforce_docs_search`, `salesforce_docs_fetch`). Without it, Claude falls back to training data (stale). Install:
 
@@ -51,6 +51,21 @@ Model Context Protocol (MCP) servers expose external tools to Claude Code so it 
 ```
 
 **Essential — `sf` CLI available in your PATH** — Claude Code drives the `sf` CLI through the built-in Bash tool. If Salesforce releases (or your team has) an official MCP wrapper for the CLI, install it too — Claude will auto-detect and use it in place of raw Bash. Either way, `sf` must be on your PATH.
+
+**Essential — OmniStudio MCP** — the Block 1 quote flow (OmniScript `CreateQuoteDCT2`, DataRaptors, FlexCards) is heavily backed by OmniStudio. This MCP lets Claude introspect and modify OmniScripts, DataRaptors, IPs and FlexCards directly. Recommended `.mcp.json` config at the project root:
+
+```json
+{
+  "mcpServers": {
+    "omnistudio-mcp": {
+      "command": "npx",
+      "args": ["-y", "@salesforce/omnistudio-mcp"]
+    }
+  }
+}
+```
+
+⚠️ **Known gotcha with `sfcli: true`**: the MCP tries to resolve credentials by calling `sf org auth show-access-token` interactively, which pauses on a "Are you sure?" prompt. Because the subprocess has no TTY, the command hangs and eventually exits with code 2 — no env var fixes this. Use the **`sfcli: false` + injected tokens** path instead. There's a helper script at `demo-metadata/scripts/setup-omnistudio-mcp.sh` that generates a `.mcp.json` with `SF_ACCESS_TOKEN` and `SF_INSTANCE_URL` pre-populated, without printing the token to your terminal or shell history. See [`demo-metadata/learnings/omnistudio-mcp-setup.md`](demo-metadata/learnings/omnistudio-mcp-setup.md) for the full write-up.
 
 **Optional — Slack MCP** — helpful if you want Claude to read your team channels (RFP threads, demo prep discussions, screenshots) and use them as context. Not required to run the scripts, but useful during the design phase (as we used it during the ALFA build).
 
