@@ -122,3 +122,19 @@ When creating an Opportunity that will hold an RCA Quote, the RecordType.Develop
 ## 14. Pricebook2Id on Opportunity
 
 Official docs say Opportunity needs Pricebook2Id populated for the LWC to work. In practice, Rachel Adams' Opp has Pricebook2Id=NULL and it works (the Quote manages its own Pricebook). But explicitly setting the Standard Pricebook on the Opp doesn't hurt and is a defensive move.
+
+## 15. Pre-installed OmniScripts don't always activate — duplicate as workaround
+
+The FINS QBranch IDO ships with a set of OmniScripts pre-installed (`CreateQuoteDCT`, several `Insurance_*` variants, etc.). In practice, on freshly-provisioned IDOs some of them come in as **Inactive** or **Draft** and refuse to be activated cleanly through the UI or via `sf` deploy — a known intermittent issue with pre-installed OmniStudio components in QBranch IDOs.
+
+**The workaround is to duplicate the original OmniScript**:
+1. In OmniStudio Designer, open the original (`CreateQuoteDCT`, label `Create Quote B2C Insurance`).
+2. Click **Save As** → suffix the name with a `2` (`CreateQuoteDCT2`, label `Create Quote B2C Insurance 2`).
+3. Activate the duplicate. Because the duplicate is created fresh, it activates cleanly.
+4. Update any Action Launcher / Flow / component that referenced the original to point at the duplicate — or leave both and use the duplicate from the Action Launcher.
+
+Both scripts have identical logic. The `2` suffix in this repo is that workaround baked in. If a future IDO fixes the activation issue, you can go back to the original and drop the `2`.
+
+**Why this happens** (best-effort explanation): pre-installed OmniStudio components carry runtime metadata (compiled JSON, IsActive flag) that sometimes lands inconsistently between the IDO's snapshot state and the running org state. Duplicating forces a fresh compilation and activation on the runtime, bypassing whatever was corrupted in the original.
+
+The same pattern applies to any pre-installed OmniScript in a QBranch IDO that refuses to activate — not just the Quote one. If you're building a demo that depends on `Insurance_ProposalGenerator` or similar and it won't activate, duplicate it.

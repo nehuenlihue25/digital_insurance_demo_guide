@@ -315,7 +315,9 @@ In this first block we'll demonstrate how Insurance on Core, via the Product Cat
 > 2. **The linked Opportunity's RecordType** must be `SimpleOpportunity` — no other RT has the required pricebook/configurator bindings for this flow.
 > 3. **The Opportunity's `Pricebook2Id`** must be the Standard Pricebook, resolved dynamically.
 >
-> The **OmniScript `Create Quote B2C Insurance 2`** encapsulates all three: it creates the Opportunity with the right RT, links the Quote, and sets `TransactionType`. That's why the demo flow starts from the Account's Action Launcher — never from the Quotes tab directly.
+> The **OmniScript `Create Quote B2C Insurance 2`** (API name `CreateQuoteDCT2`) encapsulates all three: it creates the Opportunity with the right RT, links the Quote, and sets `TransactionType`. That's why the demo flow starts from the Account's Action Launcher — never from the Quotes tab directly.
+>
+> **Note on the "2" suffix.** The FINS QBranch IDO ships with the original OmniScript `CreateQuoteDCT` (label `Create Quote B2C Insurance`). In practice the original doesn't always activate cleanly on freshly-provisioned IDOs — a known intermittent issue with pre-installed OmniStudio components. The workaround used in this demo is to **duplicate the original**, rename the copy with a `2` suffix (`CreateQuoteDCT2` / `Create Quote B2C Insurance 2`), and activate the duplicate. Both scripts have identical logic; the duplicate is just a version that's guaranteed to be Active in your org. If you provision a new IDO and the original works fine, you can use it directly and adjust the runbook's talk track accordingly.
 >
 > In real life, the same OmniScript would first look up an existing Opportunity for the customer (or create one from a broker referral) and then create the linked Quote with the correct fields. In this demo we simplified it to "one click and both records are ready", but the underlying pattern is: **Opportunity first (with SimpleOpportunity RT + Standard Pricebook) → Quote linked to it (with TransactionType populated) → then Browse Catalogs**. Any deviation from this order breaks the LWC.
 >

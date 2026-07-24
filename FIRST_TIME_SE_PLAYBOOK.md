@@ -29,6 +29,8 @@ You need the `FINS QBranch - INS on Core IDO`. Any other Digital Insurance-flavo
 
 **Why**: any other org (SDO Financial Services, SDO Sales, plain scratch org) doesn't have the ~35 Permission Set Licenses this demo depends on. You'll spend the next 4 hours chasing them from your account team, and that's if you know exactly which ones to ask for. The IDO ships with everything already Active — you just have to assign them to your user.
 
+**Reference — what's inside the IDO**: the canonical index of every pre-installed OmniScript, DataRaptor, Flow and demo script in the FINS QBranch IDO lives in this Google Sheet (Salesforce SSO required): https://docs.google.com/spreadsheets/d/13AFoGgsHwyCBxdMj2w7QK5H5m9_poU9zDPM7N9oU1bc/edit?gid=1261614130#gid=1261614130. Cross-reference it whenever you're wondering "does the IDO already have an OmniScript / Flow / DataRaptor for X?" — cheaper than reinventing.
+
 ### 0.2 The `sf` CLI (v2)
 
 - macOS: `brew install --cask sf-cli`

@@ -95,3 +95,7 @@ Use the Salesforce Docs MCP (`salesforce_docs_search` + `salesforce_docs_fetch`)
 ## When working with OmniStudio (OmniScripts, DataRaptors, Integration Procedures, FlexCards)
 
 Block 1's Quote flow is backed by OmniScript `CreateQuoteDCT2` + DataRaptors. If the OmniStudio MCP is configured (see README section 2), Claude can introspect and modify these directly. If it isn't, generate its `.mcp.json` with `demo-metadata/scripts/setup-omnistudio-mcp.sh <alias>` and restart Claude Code — do NOT try to fix it by setting `sfcli: true`, the interactive `sf org auth show-access-token` confirmation will hang the MCP subprocess. Full write-up: `demo-metadata/learnings/omnistudio-mcp-setup.md`.
+
+**The `CreateQuoteDCT2` name is a workaround, not the canonical name.** The IDO ships with the original `CreateQuoteDCT` (label `Create Quote B2C Insurance`), but on freshly-provisioned QBranch IDOs it doesn't always activate. This repo uses a duplicate with a `2` suffix (`CreateQuoteDCT2` / `Create Quote B2C Insurance 2`) which activates cleanly. Same logic, different Id. If the original works in your target IDO, you can use it directly and skip the duplicate. See gotcha #15 in `demo-metadata/learnings/digital-insurance-gotchas.md`.
+
+**Canonical index of all pre-installed OmniScripts / demo scripts in the FINS QBranch IDO**: https://docs.google.com/spreadsheets/d/13AFoGgsHwyCBxdMj2w7QK5H5m9_poU9zDPM7N9oU1bc/edit?gid=1261614130#gid=1261614130 (Salesforce internal). Cross-reference this before assuming an OmniScript exists or doesn't.

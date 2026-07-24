@@ -58,7 +58,9 @@ Model Context Protocol (MCP) servers expose external tools to Claude Code so it 
 
 **Essential — `sf` CLI available in your PATH** — Claude Code drives the `sf` CLI through the built-in Bash tool. If Salesforce releases (or your team has) an official MCP wrapper for the CLI, install it too — Claude will auto-detect and use it in place of raw Bash. Either way, `sf` must be on your PATH.
 
-**Essential — OmniStudio MCP** — the Block 1 quote flow (OmniScript `Create Quote B2C Insurance 2`, DataRaptors, FlexCards) is heavily backed by OmniStudio. This MCP lets Claude introspect and modify OmniScripts, DataRaptors, Integration Procedures and FlexCards directly.
+**Essential — OmniStudio MCP** — the Block 1 quote flow (OmniScript `CreateQuoteDCT2` — API name; label `Create Quote B2C Insurance 2`) plus supporting DataRaptors and FlexCards is heavily backed by OmniStudio. This MCP lets Claude introspect and modify OmniScripts, DataRaptors, Integration Procedures and FlexCards directly.
+
+> **Why the `2` suffix on the OmniScript name.** The IDO ships with the original `CreateQuoteDCT` (label `Create Quote B2C Insurance`). On freshly-provisioned QBranch IDOs the original doesn't always activate cleanly — this is a known intermittent issue with pre-installed OmniStudio components. The workaround baked into this repo is to duplicate the original, rename the copy with a `2` suffix, and activate the duplicate. Full detail in [gotcha #15](demo-metadata/learnings/digital-insurance-gotchas.md).
 
 ⚠️ **Do NOT use the `sfcli: true` path from the package README.** It calls `sf org auth show-access-token` interactively, which requires `--no-prompt` or `--json` to skip the "Are you sure?" confirmation. The MCP doesn't pass either flag, its subprocess has no TTY, so it hangs on the prompt and eventually exits with code 2. No environment variable bypasses this. Use the **`sfcli: false` + injected token** path instead — the repo ships a helper that sets this up cleanly.
 
@@ -202,6 +204,10 @@ The full list of **14 documented gotchas** lives in [`demo-metadata/learnings/di
 7. **MDAPI report validation traps** that only surface at deploy time — reference/lookup FKs can't be CRT columns even when SOQL accepts them; `<legendPosition>` rejects `Right` and `Bottom` in v62 (omit the element); `<rowLimit>` on Tabular reports accepts only `10` or `25`; a grouping column can't also appear in `<columns>`; report `<name>` is capped at 40 chars; Summary reports with a chart require `<chartSummaries>`.
 
 The other 7 gotchas (AttributePicklistValue global uniqueness, hidden validation rules on `ClaimItem`/`ClaimCoverage`, sf CLI access-token redaction, and more) are in the learnings file — worth a read before your first debug session.
+
+## External resources (Salesforce internal)
+
+- **[FINS QBranch — INS on Core Demo Scripts (Google Sheet)](https://docs.google.com/spreadsheets/d/13AFoGgsHwyCBxdMj2w7QK5H5m9_poU9zDPM7N9oU1bc/edit?gid=1261614130#gid=1261614130)** — the canonical index of all demo scripts / OmniScripts / Flows that ship pre-installed in the FINS QBranch — INS on Core IDO. Cross-reference when adapting or extending: if you're wondering "does the IDO already have an OmniScript for X?" or "which pricing procedure does the Auto Gold demo use?", start here rather than guessing. Salesforce SSO required.
 
 ## Case study context
 
