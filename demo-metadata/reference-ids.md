@@ -1,6 +1,10 @@
-# Reference IDs — org ins-qbranch-alfa
+# Reference IDs — historical snapshot from `ins-qbranch-alfa`
 
-> WARNING: These IDs are from the ins-qbranch-alfa org (org 00Dg8000009T1MvEAK) captured 2026-07-08. They WILL CHANGE in any other org. The replication scripts resolve IDs dynamically via Name/Code — this file is ONLY for debugging/verification, not for copying into scripts.
+> ⚠️ **These IDs are a historical snapshot from ONE specific Storm org, captured 2026-07-08.** They will NOT match your org. Every automation script under `demo-metadata/scripts/` resolves IDs dynamically by Name / Code / DeveloperName; this file exists only as a debugging reference for the original build.
+>
+> **To get the equivalent IDs for YOUR org, run `./scripts/00c-resolve-ids.sh <your-alias>`** — it queries your live org and prints the equivalent table in a format you can copy-paste into your own working notes or `source` as shell variables.
+>
+> **Never copy an ID from this file into a script or a live command against your org** — every ID here will be wrong for any org that isn't the original one. This applies especially to the Storm URL, the User Id, Product2/Account/Policy/Claim/Dashboard IDs, and everything else.
 
 ## Org
 

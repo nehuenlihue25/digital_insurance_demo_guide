@@ -10,6 +10,15 @@
 
 ---
 
+> ⚠️ **The Salesforce IDs and Storm URLs below are from the original engagement — they will not match your org.** Before rehearsing this runbook against your own IDO, run:
+>
+> ```bash
+> ./demo-metadata/scripts/00c-resolve-ids.sh <your-org-alias>
+> ```
+>
+> That prints every ID and URL the runbook references, resolved against your org. Copy-paste them into a local copy of this runbook (or `source` the `--format=env` output to have them as shell variables). The Salesforce IDs in the FINS QBranch IDO **change every time the IDO is provisioned** — never hardcode them.
+
+
 ## 0. How to use this document
 
 This file is the **starting point**. Read it first, run the checklist, and only then open the four block runbooks. Each block runbook assumes the master checklist has already been executed and that you have the org open with the correct tabs.

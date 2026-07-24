@@ -31,6 +31,7 @@ demo-metadata/
 ├── scripts/                     ← shell scripts to recreate the demo
 │   ├── 00-prerequisites.sh      ← smoke test: sObjects reachable + minimal PSL check
 │   ├── 00b-verify-baseline.sh  ← full baseline verify against baseline/*.md (36 PSLs + 7 PS + 5 RT + qbranch package)
+│   ├── 00c-resolve-ids.sh      ← query your org for every ID the runbooks reference (Bundle, Coverages, Account, Policy, Claim, Dashboards) — output as table or sourceable env vars
 │   ├── 01-block1-product.sh    ← create catalog + product + coverages + attrs
 │   ├── 02-block5-clauses.sh    ← create InsuranceClauses + productClauses + variableMaps
 │   ├── 03-block2-policy.sh     ← accounts + policy + coverages + 4 IPTs (issuance/endorsement/renewal/cancellation) + policy clauses + 2 CardPaymentMethods

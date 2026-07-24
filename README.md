@@ -169,7 +169,13 @@ cd demo-metadata/
 ./scripts/04-block3-claim.sh $ORG               # SIN-PYME + participants + items + reserves + payments
 ./scripts/05-block6-deploy-reports.sh $ORG      # 5 CRTs + 11 reports + 3 dashboards via SOAP MDAPI
 
-# Step 4 — (optional) Wire up the OmniStudio MCP for Claude Code
+# Step 4 — Resolve the IDs the runbooks reference against YOUR org.
+# The runbooks show IDs and URLs from the original engagement; every one
+# of them will be different in your org. This script queries your org
+# and prints the equivalent table (or sourceable env vars with --format=env).
+./scripts/00c-resolve-ids.sh $ORG
+
+# Step 5 — (optional) Wire up the OmniStudio MCP for Claude Code
 # so you can prompt Claude to introspect OmniScripts/DataRaptors.
 ./scripts/setup-omnistudio-mcp.sh $ORG          # generates .mcp.json — restart Claude Code after
 ```
