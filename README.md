@@ -161,20 +161,24 @@ For the full narrative of meta-lessons on how the original build with Claude wen
 
 ### Recommended workflow
 
-1. Start Claude with the **README + `demo-metadata/reference-ids.md`** as its initial context.
+1. Start Claude with the **README + `demo-metadata/reference-ids.md`** as its initial context. `CLAUDE.md` at the repo root loads automatically.
 2. Ask Claude to read the **specific runbook** for the block you're working on (don't front-load all four — the runbooks are long).
-3. Delegate the build steps to Claude with **ultracode enabled**, letting it drive `sf` CLI, MDAPI deploys, and REST inserts.
+3. Delegate the build steps to Claude, letting it drive `sf` CLI, MDAPI deploys, and REST inserts. Use the OmniStudio MCP for OmniScript / DataRaptor introspection.
 4. **Verify each block in the org UI** before moving to the next one. The runbooks list the exact tab / record / attribute to eyeball.
 
-## The 5 most critical gotchas (spoilers)
+## The most critical gotchas (spoilers)
 
-1. **`Product2.ProductClass` is not writable** — it is auto-derived from `RecordType` (Coverage → Simple) or `Type` (Bundle → Bundle). Do not include it in the INSERT payload.
-2. **`ProductRelatedComponent.ParentProductRole` / `ChildProductRole`** are auto-derived from `ProductRelationshipTypeId`. Same rule — don't include them.
-3. **PADs are NOT auto-generated** with `BasedOnId` — you must create `ProductAttributeDefinition` records manually, one per (Product2 × ProductClassificationAttr). Six coverages × eight attributes = 48 records.
-4. **`InsuranceClause.Type`** (not `ClauseType`, which many docs incorrectly show) — this catches almost everyone.
-5. **RCA Quote requires `TransactionType` populated** + an Opportunity with `SimpleOpportunity` RecordType. Without both, the Product Configuration LWC throws `Cannot read properties null (reading 'groups')`.
+The full list of **14 documented gotchas** lives in [`demo-metadata/learnings/digital-insurance-gotchas.md`](demo-metadata/learnings/digital-insurance-gotchas.md). The seven that trip up almost everyone:
 
-Full list of 13 gotchas: [`demo-metadata/learnings/digital-insurance-gotchas.md`](demo-metadata/learnings/digital-insurance-gotchas.md).
+1. **Never create the Quote manually — use the OmniScript.** The Product Configurator LWC crashes with `Cannot read properties null (reading 'groups')` on any Quote that wasn't created through the `Create Quote B2C Insurance 2` OmniScript. Three fields the UI marks optional but the LWC requires: `Quote.TransactionType='AutoTransactionType'`, linked `Opportunity.RecordType='SimpleOpportunity'`, `Opportunity.Pricebook2Id=Standard`. The OmniScript sets all three; hand-creating skips them.
+2. **`Product2.ProductClass` is not writable** — it is auto-derived from `RecordType` (Coverage → Simple) or `Type` (Bundle → Bundle). Do not include it in the INSERT payload.
+3. **`ProductRelatedComponent.ParentProductRole` / `ChildProductRole`** are auto-derived from `ProductRelationshipTypeId`. Same rule — don't include them.
+4. **PADs are NOT auto-generated** with `BasedOnId` — you must create `ProductAttributeDefinition` records manually, one per (Product2 × ProductClassificationAttr). Six coverages × eight attributes = 48 records.
+5. **`InsuranceClause.Type`** (not `ClauseType`, which many docs incorrectly show) — this catches almost everyone.
+6. **Field name traps on reporting sObjects** — several intuitive names don't exist: `Claim.PolicyId` → `PolicyNumberId`; `Claim.InitialLossDate` → `LossDate`; `Claim.TotalPaidAmount` → `ActualAmount`; `InsurancePolicy.TermPremium` → `TermPremiumAmount`; `ClaimCoveragePaymentDetail.PaymentAmount` → `ClaimedAmount` or `AdjustedAmount`. Always `sf sobject describe` before writing CRT XML.
+7. **MDAPI report validation traps** that only surface at deploy time — reference/lookup FKs can't be CRT columns even when SOQL accepts them; `<legendPosition>` rejects `Right` and `Bottom` in v62 (omit the element); `<rowLimit>` on Tabular reports accepts only `10` or `25`; a grouping column can't also appear in `<columns>`; report `<name>` is capped at 40 chars; Summary reports with a chart require `<chartSummaries>`.
+
+The other 7 gotchas (AttributePicklistValue global uniqueness, hidden validation rules on `ClaimItem`/`ClaimCoverage`, sf CLI access-token redaction, and more) are in the learnings file — worth a read before your first debug session.
 
 ## Case study context
 
