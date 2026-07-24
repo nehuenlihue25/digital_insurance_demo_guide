@@ -58,20 +58,29 @@ Model Context Protocol (MCP) servers expose external tools to Claude Code so it 
 
 **Essential — `sf` CLI available in your PATH** — Claude Code drives the `sf` CLI through the built-in Bash tool. If Salesforce releases (or your team has) an official MCP wrapper for the CLI, install it too — Claude will auto-detect and use it in place of raw Bash. Either way, `sf` must be on your PATH.
 
-**Essential — OmniStudio MCP** — the Block 1 quote flow (OmniScript `CreateQuoteDCT2`, DataRaptors, FlexCards) is heavily backed by OmniStudio. This MCP lets Claude introspect and modify OmniScripts, DataRaptors, IPs and FlexCards directly. Recommended `.mcp.json` config at the project root:
+**Essential — OmniStudio MCP** — the Block 1 quote flow (OmniScript `Create Quote B2C Insurance 2`, DataRaptors, FlexCards) is heavily backed by OmniStudio. This MCP lets Claude introspect and modify OmniScripts, DataRaptors, Integration Procedures and FlexCards directly.
 
-```json
-{
-  "mcpServers": {
-    "omnistudio-mcp": {
-      "command": "npx",
-      "args": ["-y", "@salesforce/omnistudio-mcp"]
-    }
-  }
-}
-```
+⚠️ **Do NOT use the `sfcli: true` path from the package README.** It calls `sf org auth show-access-token` interactively, which requires `--no-prompt` or `--json` to skip the "Are you sure?" confirmation. The MCP doesn't pass either flag, its subprocess has no TTY, so it hangs on the prompt and eventually exits with code 2. No environment variable bypasses this. Use the **`sfcli: false` + injected token** path instead — the repo ships a helper that sets this up cleanly.
 
-⚠️ **Known gotcha with `sfcli: true`**: the MCP tries to resolve credentials by calling `sf org auth show-access-token` interactively, which pauses on a "Are you sure?" prompt. Because the subprocess has no TTY, the command hangs and eventually exits with code 2 — no env var fixes this. Use the **`sfcli: false` + injected tokens** path instead. There's a helper script at `demo-metadata/scripts/setup-omnistudio-mcp.sh` that generates a `.mcp.json` with `SF_ACCESS_TOKEN` and `SF_INSTANCE_URL` pre-populated, without printing the token to your terminal or shell history. See [`demo-metadata/learnings/omnistudio-mcp-setup.md`](demo-metadata/learnings/omnistudio-mcp-setup.md) for the full write-up.
+**Setup — 3 steps:**
+
+1. Clone this repo and cd into its root (the same directory where `README.md` lives).
+2. Run the helper — it reads the access token via `sf org display --json`, writes a `.mcp.json` in the current directory, and never prints the token to stdout or your shell history:
+
+   ```bash
+   ./demo-metadata/scripts/setup-omnistudio-mcp.sh <your-org-alias>
+   # Example: ./demo-metadata/scripts/setup-omnistudio-mcp.sh ins-alfa
+   ```
+
+   Expected output: `OK — token injected into .mcp.json. instance: https://<your-storm>.my.salesforce.com`.
+
+3. **Restart Claude Code once** so the MCP subprocess picks up the new env vars. Then the OmniStudio tools show up in Claude's tool inventory (search for `omnistudio` — you should see tools like `list_omniscripts`, `get_omniscript`, `list_data_raptors`, etc.).
+
+**When to re-run the helper**: your Storm org expired and you provisioned a new IDO; you switched which alias points at the target org; MCP tools start returning 401.
+
+`.mcp.json` is in `.gitignore` — it contains a live access token and must never be committed. Each teammate generates their own with the helper.
+
+Full write-up (both auth paths, when to re-generate, manual Python alternative): [`demo-metadata/learnings/omnistudio-mcp-setup.md`](demo-metadata/learnings/omnistudio-mcp-setup.md).
 
 **Optional — Slack MCP** — helpful if you want Claude to read your team channels (RFP threads, demo prep discussions, screenshots) and use them as context. Not required to run the scripts, but useful during the design phase (as we used it during the ALFA build).
 
@@ -84,7 +93,7 @@ sf data query --target-org <your-alias> \
    --query "SELECT COUNT() FROM Product2 WHERE Type='Bundle'"
 ```
 
-If all three commands succeed, you're ready for the **Quick start** below.
+If all three succeed, you're ready for the **Quick start** below. And before you run script `01` — do the baseline verification described in step 1 of Quick start; it saves hours of debugging opaque LWC errors caused by missing PS assignments.
 
 ## What's in this repo
 
@@ -111,22 +120,36 @@ If all three commands succeed, you're ready for the **Quick start** below.
 Prerequisites:
 - **The `FINS QBranch - INS on Core IDO`** provisioned via STORM (Slack) or Solutions Workspace — see the ⚠️ section above
 - `sf` CLI authenticated with an alias pointing at your IDO
-- Your demo user assigned all the PSLs listed in `demo-metadata/learnings/rca-rlm-setup.md` (most are pre-provisioned in the IDO, but assignment to the user is manual)
+- All 36 required PSLs + 7 critical PSs assigned to your demo user — the full documented baseline lives in [`demo-metadata/baseline/`](demo-metadata/baseline/). The `00b-verify-baseline.sh` script (step 1 below) checks all of them automatically and reports which are missing.
 
 ```bash
 export ORG=<your-org-alias>
 cd demo-metadata/
-./scripts/00-prerequisites.sh $ORG              # verify PSL/PS + connectivity
+
+# Step 1 — Verify the org matches the baseline before doing anything else.
+# Saves hours of debugging: exits non-zero with a clear list of missing
+# PSLs / PSs / Record Types / packages if your org isn't equivalent to a
+# working FINS QBranch IDO.
+./scripts/00b-verify-baseline.sh $ORG
+
+# Step 2 — Basic sanity check (sObjects reachable, connectivity).
+./scripts/00-prerequisites.sh $ORG
+
+# Step 3 — Build the demo data (~10 min total, all idempotent).
 ./scripts/01-block1-product.sh $ORG             # Pyme Integral bundle + 6 coverages + 48 PADs
 ./scripts/02-block5-clauses.sh $ORG             # 6 Spanish InsuranceClauses + variableMaps
-./scripts/03-block2-policy.sh $ORG              # Accounts + POL-PYME + coverages + transactions
+./scripts/03-block2-policy.sh $ORG              # 3 Accounts + POL-PYME + coverages + 4 IPTs + 2 CardPaymentMethods
 ./scripts/04-block3-claim.sh $ORG               # SIN-PYME + participants + items + reserves + payments
-./scripts/05-block6-deploy-reports.sh $ORG      # deploy reports + dashboards via SOAP MDAPI
+./scripts/05-block6-deploy-reports.sh $ORG      # 5 CRTs + 11 reports + 3 dashboards via SOAP MDAPI
+
+# Step 4 — (optional) Wire up the OmniStudio MCP for Claude Code
+# so you can prompt Claude to introspect OmniScripts/DataRaptors.
+./scripts/setup-omnistudio-mcp.sh $ORG          # generates .mcp.json — restart Claude Code after
 ```
 
 Every script is idempotent, resolves IDs dynamically (never hardcoded), and prefixes `SF_DISABLE_LOG_FILE=true` so `sf` behaves in restricted shells.
 
-Steps that **require the UI** (OmniScript `CreateQuoteDCT2`, Product Configuration LWC, Issue Policy wizard) are documented in the Block 1 runbook — they cannot be automated today.
+Steps that **require the UI** (OmniScript `Create Quote B2C Insurance 2`, Product Configuration LWC, Issue Policy wizard) are documented in the Block 1 runbook — they cannot be automated today. Read the runbook's step 2.8 in full before your first live rehearsal — **never create the Quote manually**, the LWC will crash (details in the "critical gotchas" section below).
 
 ## Using this repo with Claude Code
 
