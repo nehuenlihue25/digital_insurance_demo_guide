@@ -1,6 +1,6 @@
 # Runbook — Block 3: Claims
 
-**Duration**: 45 min | **Presenter**: Luis Fabián | **Org**: ins-qbranch-alfa
+**Duration**: 45 min | **Presenter**: the presenting SE | **Org**: ins-qbranch-alfa
 **Demo date**: 2026-07-09 | **Client**: Seguros ALFA (Bogotá, Colombia)
 **Instance**: https://storm-c90aab66569c63.my.salesforce.com
 
@@ -39,7 +39,7 @@ https://storm-c90aab66569c63.my.salesforce.com/lightning/o/InsurancePolicy/list
 Filter by `POL-PYME-2026-0001` and open it — you'll use it to show the policy→claim link.
 
 **Quick checklist before speaking:**
-- [ ] You're logged in as **Nehuen Lihue Lobo** (or whoever is the claim owner; if not, switch the "My Claims" filter to "All Claims").
+- [ ] You're logged in as the demo user (the same user that ran `04-block3-claim.sh` — the script sets `Claim.OwnerId` to whoever executed it). If a different user is logged in, switch the "My Claims" filter to "All Claims" so the claim still shows up.
 - [ ] Tab 1 shows the Claim header with `SIN-PYME-2026-0001` and Status = **Coverage Confirmed**.
 - [ ] Tab 2 shows the ClaimCoverage `CC-SIN-PYME-2026-0001-Incendio` with Loss Reserve = **45,000,000** and Expense Reserve = **5,000,000**.
 - [ ] The **Insurance Agent Console** app is loaded in the App Launcher (the same one Block 2 already left open).
@@ -100,7 +100,7 @@ If something doesn't load: refresh (Cmd+R). If it still fails, go directly to th
 - **Loss Type**: `Partial Loss`
 - **Estimated Amount**: `$48,000,000`
 - **Loss Date**: `9/10/2026`
-- **Owner**: `Nehuen Lihue Lobo`
+- **Owner**: the demo user who ran `04-block3-claim.sh` (Claim.OwnerId is set dynamically to the current authenticated user)
 
 **Sample talk track:**
 > "The fields you see — `Claim Type`, `Status`, `Severity`, `Loss Type`, `Estimated Amount` — are all from the standard Insurance on Core model. In Spanish they'd be: Tipo de Siniestro `Incendio/Daño por humo`, Estado `Cobertura Confirmada`, Severidad `Alta`, Tipo de Pérdida `Pérdida Parcial`, Monto Estimado `48 million pesos` and Fecha del Siniestro `September 10`.
@@ -528,7 +528,7 @@ If something breaks live, here are the emergency exits without losing rhythm.
 ### Fallback F — The client pushes on a topic you don't have
 
 - Don't make it up. Time-buying phrase: "Great question — to avoid giving you an imprecise answer, I'll note it down and bring the detail back in the follow-up session with the product team."
-- Note it down physically. At the end of the day, review it with Nehuen before responding.
+- Note it down physically. At the end of the day, review it with the technical backup before responding.
 
 ### Fallback G — Running out of time (10 min left of 45 and you're in Phase 3)
 

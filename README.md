@@ -6,7 +6,7 @@ This repo is designed to be **forked and adapted**. The concrete demo values (Se
 
 ## 🚀 If it's your first time — start here
 
-**Open [`FIRST_TIME_SE_PLAYBOOK.md`](FIRST_TIME_SE_PLAYBOOK.md).** It's a phase-by-phase walkthrough (0 → demo-ready in ~60 min) that explains **why** of every step, not just the what. Includes baseline verification, Claude Code + MCP setup, when to prompt Claude for help, and what to do at each failure point. Written after real feedback from a colleague who couldn't complete the demo solo on the first attempt — the playbook fills exactly the gaps she hit.
+**Open [`FIRST_TIME_SE_PLAYBOOK.md`](FIRST_TIME_SE_PLAYBOOK.md).** It's a phase-by-phase walkthrough (0 → demo-ready in ~60 min) that explains **why** of every step, not just the what. Includes baseline verification, Claude Code + MCP setup, when to prompt Claude for help, and what to do at each failure point. Written after real feedback from an early user who couldn't complete the demo solo on the first attempt — the playbook fills exactly the gaps encountered.
 
 The rest of this README is the technical reference behind that playbook.
 
@@ -194,7 +194,7 @@ Issues and PRs welcome. If you adapt the runbooks to another line of business (A
 
 ## Credits
 
-Built with [Claude Code](https://claude.com/product/claude-code) by Nehuen Lobo (@nehuenlihue25) for the Seguros ALFA (Grupo Aval, Colombia) RFP engagement — presentation 2026-07-09.
+Built with [Claude Code](https://claude.com/product/claude-code) during the Seguros ALFA (Grupo Aval, Colombia) RFP engagement — presentation 2026-07-09. Open-sourced so the next SE doesn't have to start from scratch.
 
 ## License
 

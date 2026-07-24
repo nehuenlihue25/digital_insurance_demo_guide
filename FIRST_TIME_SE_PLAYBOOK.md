@@ -91,7 +91,7 @@ The script checks 4 things against the reference baseline captured from a workin
 - **qbranch package missing** → same as above — wrong IDO type.
 - Re-run `00b-verify-baseline.sh` until it's all green.
 
-**Why**: this is the single most valuable 5-minute investment. Sandra spent 3 hours debugging the Quote flow on her first attempt because `SimpleOpportunity` wasn't assigned — the LWC threw `Cannot read properties null (reading 'groups')` and there was no way to trace it back to the PS without knowing.
+**Why**: this is the single most valuable 5-minute investment. An early user of this repo spent 3 hours debugging the Quote flow on their first attempt because `SimpleOpportunity` wasn't assigned — the LWC threw `Cannot read properties null (reading 'groups')` and there was no way to trace it back to the missing PS without knowing.
 
 **Troubleshooting Phase 1**: [`demo-metadata/baseline/README.md`](demo-metadata/baseline/README.md) explains each check + what "missing" means.
 
@@ -182,6 +182,19 @@ Deploys via SOAP MDAPI (`sf project deploy start` doesn't work in restricted env
 
 ## Phase 5 — Rehearse the 4 blocks (30–45 min)
 
+> ⚠️ **Before you rehearse Block 1 — one non-negotiable rule about the Quote flow.**
+>
+> **Never create the Quote by clicking "New" on the Quotes tab.** The Product Configurator LWC will crash with `Cannot read properties null (reading 'groups')` because a hand-created Quote is missing three fields the LWC silently requires:
+> - `Quote.TransactionType` = `AutoTransactionType` (looks optional in the UI, isn't)
+> - Linked `Opportunity.RecordType` = `SimpleOpportunity`
+> - `Opportunity.Pricebook2Id` = Standard Pricebook
+>
+> The demo flow starts from the **Account → Action Launcher → "Create Quote B2C Insurance 2"** OmniScript, which builds the Opportunity + Quote with all three fields set correctly in a single click. Any other entry point (Quotes tab, Opportunity related list, custom shortcut) skips this setup and the LWC breaks.
+>
+> In production, the same pattern applies — the OmniScript would look up an existing Opportunity (broker referral, prior quote request) or create a new one, then link the Quote with the right fields. We simplified the demo to one click. **Do not "improve" this by creating the Quote directly** — you'll spend hours debugging an LWC error with no useful stack trace.
+>
+> Full write-up: [`CLAUDE.md`](CLAUDE.md) section "RCA Quote requires TransactionType — never create Quote manually" and the Block 1 runbook, step 2.8.
+
 Now walk through each runbook once, in order:
 
 1. [`RUNBOOK_BLOCK1_PYME_PRODUCT.md`](RUNBOOK_BLOCK1_PYME_PRODUCT.md) — 48 min. Product Catalog + Quote flow + Issue Policy.
@@ -237,7 +250,7 @@ The demo values are placeholders. When you customize:
 - **Do not** try to run the scripts against a non-QBranch IDO "just to see what happens" — you'll get 30 minutes of red errors and no useful output. Fix the baseline first.
 - **Do not** commit `.mcp.json` (contains access tokens) — it's in `.gitignore` for a reason.
 - **Do not** hardcode any ID in a script — every ID in this repo is resolved dynamically at runtime. If you're tempted to hardcode, you're missing a lookup pattern.
-- **Do not** skip Phase 1. Ever. Sandra learned this the hard way; you don't have to.
+- **Do not** skip Phase 1. Ever. Others have learned this the hard way; you don't have to.
 
 ---
 

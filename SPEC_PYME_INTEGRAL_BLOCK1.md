@@ -602,7 +602,7 @@ All critique items reflected. Each with its mitigation in Step 0 or in the flow.
 
 16. **Insurance Coexistence (LOW critique #17)** — Step 0.c lists all Product2 RTs; managed namespaces will show up with prefixes. If there's a collision with the managed package, adjust RT live.
 
-17. **Sandbox refresh timing** — All lookups are by Name/Code/DeveloperName, resilient to refresh. Coordinate with Laura/team so no refresh happens between 2026-07-07 and 2026-07-08 AM.
+17. **Sandbox refresh timing** — All lookups are by Name/Code/DeveloperName, resilient to refresh. Coordinate with the industry SE/team so no refresh happens between 2026-07-07 and 2026-07-08 AM.
 
 18. **`sf` CLI**: `SF_DISABLE_LOG_FILE=true` as prefix or exported at the start of the session.
 ---
@@ -666,7 +666,7 @@ All critique items reflected. Each with its mitigation in Step 0 or in the flow.
    - `InsuranceDefaultPricingProcedure` **does not exist** in the org — only group-specific ones (Group_Insurance_Default_Pricing_Procedure, GroupDental, GroupMedical, GroupVision). **Confirmed MVP = PricebookEntry only.**
 
 8. **Locale — NEW STEP:**
-   - Nehuen locale = `en_US`, currency = `USD`. **Before the presentation**, change to `es_CO` / `COP` (or accept verbal contextualization). Current decision: keep the demo in `en_US` to avoid breaking other blocks with currency switching; use Description/Name in Spanish, and accept Salesforce standard labels in English (Product Code, Unit Price, etc.). Explain in the presentation as "the end user would have locale es_CO".
+   - the technical backup locale = `en_US`, currency = `USD`. **Before the presentation**, change to `es_CO` / `COP` (or accept verbal contextualization). Current decision: keep the demo in `en_US` to avoid breaking other blocks with currency switching; use Description/Name in Spanish, and accept Salesforce standard labels in English (Product Code, Unit Price, etc.). Explain in the presentation as "the end user would have locale es_CO".
 
 ### Product2 Type picklist verified
 Valid values: **[Base, Bundle, Set]**. `Simple` is NOT a valid Type (though it is a valid ProductClass). Confirms that Simple coverages **do NOT set Type**.

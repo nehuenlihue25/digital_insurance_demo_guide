@@ -17,9 +17,9 @@
 
 **Revised concrete steps:**
 
-1. **Immediate ask to Luis Fabián (Tuesday 07:00-09:00):** confirm with the account team whether `DigitalInsuranceClaimManagementAddOn` + PC + CC + `DigitalInsurancePolicyAdministrationAddOn` are effectively provisioned as runtime add-ons (not just PSL Active). If NOT → open a Sev-2 case with Salesforce immediately citing release 260 and the 6 non-queryable sObjects (audit evidence).
+1. **Immediate ask to the presenting SE (Tuesday 07:00-09:00):** confirm with the account team whether `DigitalInsuranceClaimManagementAddOn` + PC + CC + `DigitalInsurancePolicyAdministrationAddOn` are effectively provisioned as runtime add-ons (not just PSL Active). If NOT → open a Sev-2 case with Salesforce immediately citing release 260 and the 6 non-queryable sObjects (audit evidence).
 2. **In parallel, verify `DigitalInsurancePolicyAdministrationAddOn`** — block 2 depends on `InsPolicyService:createPolicyVersion` (see critique #4). If the Policy Administration add-on is also not provisioned, block 2 falls too. Dry-run query: try `SELECT Id FROM InsurancePolicyVersion LIMIT 1` and `SELECT Id FROM InsurancePolicyTransaction LIMIT 1` — if they fail, both blocks go to Plan B.
-3. **Assign Permission Sets to the demo user** (Nehuen), corrected per the research fact for the adjuster persona (critique #2): `Claims Management`, `Digital Insurance Product Administration Runtime`, `Product Configurator`, `Product Catalog Management Viewer`, `Product Discovery User`, `Context Service Runtime`, `Stage Management User`, `Rule Engine Runtime`, `Omnistudio User`. **Removed** from the previous list: `Claims Administration`, `Product Catalog Management Designer`, `Product Discovery Admin`, `Digital Insurance Product Administration Management` — they do not appear in the research fact for the runtime persona and there is risk they may not exist as assignable PSLs in this org or require additional PSLs.
+3. **Assign Permission Sets to the demo user** , corrected per the research fact for the adjuster persona (critique #2): `Claims Management`, `Digital Insurance Product Administration Runtime`, `Product Configurator`, `Product Catalog Management Viewer`, `Product Discovery User`, `Context Service Runtime`, `Stage Management User`, `Rule Engine Runtime`, `Omnistudio User`. **Removed** from the previous list: `Claims Administration`, `Product Catalog Management Designer`, `Product Discovery Admin`, `Digital Insurance Product Administration Management` — they do not appear in the research fact for the runtime persona and there is risk they may not exist as assignable PSLs in this org or require additional PSLs.
 4. **Validate with SOQL:** `SELECT Id FROM ClaimCoverage LIMIT 1` + `ClaimCoveragePaymentDetail` + `ClaimPaymentSummary` + `ClaimCoverageReserveDetail` + `InsurancePolicyVersion`. If they respond → continue with base plan. If they fail → case opened Tuesday AM, decision gate Wednesday 12:00.
 5. **Configure Claim Financials LWC** on the Claim record page + field sets on `ClaimCoveragePaymentDetail` per coverage ([customize payment detail form](https://help.salesforce.com/s/articleView?id=ind.insurance_customize_the_payment_detail_form_618950.htm&release=260&type=5)).
 
@@ -89,7 +89,7 @@
 ### Block 3 — Claims (45 min) — dependent on section 1
 
 **Demo Claim:** `SIN-PYME-2026-0001` on POL-PYME-2026-0001, ClaimType `Incendio Parcial`, description in Spanish.
-**ClaimParticipants:** Panadería La Espiga (Insured), Nehuen Lobo (Adjuster owner via Claim.OwnerId), Bomberos Bogotá (Witness).
+**ClaimParticipants:** Panadería La Espiga (Insured), the technical backup (Adjuster owner via Claim.OwnerId), Bomberos Bogotá (Witness).
 **ClaimItems:** `Horno Industrial Rational` (Loss), `Estantería de Producto Terminado` (Loss), `Lucro Cesante 5 días` (Expense).
 **ClaimCoverage** against `Incendio y Aliados`: loss reserve COP 45,000,000, expense reserve COP 5,000,000.
 **ClaimCoveragePaymentDetail:** one Paid payment + another Pending Authority.
@@ -155,17 +155,17 @@ The dedicated attributes are created in Block 1 (section 4) — ensuring correct
 
 **Revised work:** 0h migration (2h recovered) + 13.5h fresh build + 3h clauses + 2h rehearsal + 2.5h buffer = **21h.** Slight over-run reduced to 2h with **structural buffer at 3 points** instead of 1h at the end.
 
-**Sequencing reset (critique #12):** the ask to Luis Fabián moves to **Monday 2026-07-06 (today, 07:00 EOD)** for confirmation before starting Tuesday AM. If his response does not arrive before Tuesday 08:00 → we start anyway with SOQL verification in parallel to the case.
+**Sequencing reset (critique #12):** the ask to the presenting SE moves to **Monday 2026-07-06 (today, 07:00 EOD)** for confirmation before starting Tuesday AM. If his response does not arrive before Tuesday 08:00 → we start anyway with SOQL verification in parallel to the case.
 
 ### Monday 2026-07-06 (today)
 
-- [ ] EOD — Ask Luis Fabián for confirmation of add-on provisioning (Claims + Policy Admin). Send before closing the day.
+- [ ] EOD — Ask the presenting SE for confirmation of add-on provisioning (Claims + Policy Admin). Send before closing the day.
 
 ### Tuesday 2026-07-07 (5h — 13:00-18:00)
 
 - [ ] 13:00-14:00 — SOQL verification: `ClaimCoverage`, `ClaimCoveragePaymentDetail`, `ClaimPaymentSummary`, `ClaimCoverageReserveDetail`, `InsurancePolicyVersion`, `InsurancePolicyTransaction`, `PermissionSetLicense LIKE '%Service Cloud%'`. Document results.
 - [ ] 14:00-15:00 — **If any claim/policy sObject fails:** open a Sev-2 case with Salesforce immediately citing release 260 and affected sObjects. Log ticket #. **If all respond:** proceed to next step.
-- [ ] 14:00 (in parallel) — Assign corrected permission sets to Nehuen.
+- [ ] 14:00 (in parallel) — Assign corrected permission sets to the technical backup.
 - [ ] 15:00-18:00 — Block 1: create the complete PCM catalog (including the 3 new dedicated AttributeDefinitions: Porcentaje_Coaseguro, Sustancias_Prohibidas, Deducible_Minimo_Evento).
 
 **Implicit Tuesday buffer:** 4h of work inside a 5h block. If the case is pending, no time is lost on speculative toggles.
@@ -234,7 +234,7 @@ The `q-agentforce` audit confirms: Agentforce licenses present, PSLs and permiss
 
 ### Explicit asks (corrected sequencing — critique #12)
 
-**To Luis Fabián (deadline: MONDAY 2026-07-06 EOD, today):**
+**To the presenting SE (deadline: MONDAY 2026-07-06 EOD, today):**
 - Confirm with the account team whether `DigitalInsuranceClaimManagementAddOn`+PC+CC and `DigitalInsurancePolicyAdministrationAddOn` are effectively provisioned as runtime (not just PSLs Active) in ins-qbranch-alfa. If not, authorize opening of a Sev-2 case Tuesday 07:00.
 - Approve 100% consolidation to ins-qbranch-alfa.
 
@@ -242,7 +242,7 @@ The `q-agentforce` audit confirms: Agentforce licenses present, PSLs and permiss
 - PCM load for Block 1 in parallel Wednesday AM (I'll hand over CSVs Tuesday 17:00). **Explicit note:** the field in InsuranceClause is `Type`, NOT `ClauseType`. Validate the header before firing.
 - Review Block 6 dashboards Wednesday 22:00-23:00 while I rehearse.
 
-**To Mario (deadline: Wednesday 2026-07-08 12:00):**
+**To management (deadline: Wednesday 2026-07-08 12:00):**
 - Validate the narrative script. Joint rehearsal Wednesday 22:00.
 - Confirm that Blocks 4 (Reinsurance) and 5 (Billing) remain out of scope with a roadmap slide.
 - **New:** prepare a response to the Agentforce question if it comes up (pre-approved paragraph above).
@@ -294,7 +294,7 @@ The only related PSLs in the org: `ServiceCloudVoicePsl` (voice), `ServiceCloudV
 3. **Endorsement via manual InsurancePolicyTransaction** — `InsurancePolicyVersion` is not supported, therefore we do NOT use `createPolicyVersion`. We create an InsurancePolicyTransaction record with `Type=Endorsement` directly (path already contemplated in section 4 of the plan).
 4. **ClaimCoveragePaymentAdjustment not available** — not critical. Payment adjustments can be narrated without showing the object (the aggregates in ClaimPaymentSummary are sufficient).
 5. **Omni-Channel routing** — fallback to Queue Assignment via Claim.OwnerId already contemplated. Don't open a case for this.
-6. **Nehuen already has ClaimManagementAdmin and DigitalInsurancePolicyAdminUserPsl assigned** (1/20 and 1/5 used) — likely these are the demo user's assignments. Still need to assign `DigitalInsuranceClaimManagementUser`, `DigitalInsuranceClaimManagementAdmin`, and the functional Permission Sets (Product Configurator, Product Catalog Management Viewer, etc.).
+6. **the technical backup already has ClaimManagementAdmin and DigitalInsurancePolicyAdminUserPsl assigned** (1/20 and 1/5 used) — likely these are the demo user's assignments. Still need to assign `DigitalInsuranceClaimManagementUser`, `DigitalInsuranceClaimManagementAdmin`, and the functional Permission Sets (Product Configurator, Product Catalog Management Viewer, etc.).
 
 ### Changes to the timeline
 
@@ -383,7 +383,7 @@ All 4 RFI blocks built and verified in `ins-qbranch-alfa`:
 **Deployed via SOAP Metadata API (sf project deploy blocked by sandbox ~/.sfdx write). Total agents/deploys iterated: 12 until green. Learnings saved to memory.**
 
 ## Handoff — UI verification before Thursday
-- [ ] Log in as Nehuen and navigate Product Catalog Management → Insurance Catalog → **Seguros Pyme** → Plan Empresarial → verify the tree
+- [ ] Log in as the technical backup and navigate Product Catalog Management → Insurance Catalog → **Seguros Pyme** → Plan Empresarial → verify the tree
 - [ ] Verify 6 coverages with 8 attributes each in Product Modeler
 - [ ] View POL-PYME-2026-0001 with the 6 coverages + 2 transactions + 6 materialized clauses
 - [ ] View SIN-PYME-2026-0001 with Participants + Items + Coverage + PaymentDetails + ReserveAdjustments

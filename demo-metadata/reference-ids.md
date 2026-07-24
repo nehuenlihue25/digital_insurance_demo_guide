@@ -10,7 +10,7 @@
 | Instance URL | https://storm-c90aab66569c63.my.salesforce.com |
 | Demo username | storm.c90aab66569c63@salesforce.com |
 | Alias | ins-qbranch-alfa |
-| Nehuen Lobo (User Id) | 005g80000053bWPAAY |
+| the technical backup (User Id) | 005g80000053bWPAAY |
 
 ## Block 1 — Products + Attributes + Classifications
 

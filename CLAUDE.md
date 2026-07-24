@@ -47,11 +47,17 @@ Setting `Product2.BasedOnId = <ProductClassificationId>` does NOT create `Produc
 ### AttributePicklistValue.Code is GLOBALLY unique
 Not scoped per picklist. Suffix codes to avoid collisions (e.g., `Un_MM_DME` for Deducible Mínimo Evento vs `Un_MM` in Deducible Pyme).
 
-### RCA Quote requires TransactionType
-Without `Quote.TransactionType` populated (use `AutoTransactionType` or `GroupInsuranceTransactionType`), the Product Configuration LWC throws `Cannot read properties null (reading 'groups')`.
+### RCA Quote requires TransactionType — never create Quote manually
+Without `Quote.TransactionType` populated (use `AutoTransactionType` or `GroupInsuranceTransactionType`), the Product Configuration LWC throws `Cannot read properties null (reading 'groups')`. Combined with the RecordType and Pricebook requirements below, this means **manually creating a Quote from the Quotes tab will always fail** — the Salesforce UI doesn't require these fields but the LWC does.
+
+**Always create the Quote via the OmniScript** `Create Quote B2C Insurance 2` from the Account's Action Launcher. The OmniScript:
+1. Creates a linked Opportunity with RecordType=`SimpleOpportunity` and Pricebook2Id=Standard.
+2. Creates the Quote with `OpportunityId` pointing at (1) and `TransactionType='AutoTransactionType'` populated.
+
+In production this same pattern applies — the OmniScript would look up an existing Opportunity or create one from a broker referral, then create the linked Quote with correct fields. Never hand-craft the two records in isolation.
 
 ### Opportunity RecordType for RCA
-Must be `SimpleOpportunity` for the Revenue Cloud Advanced Quote flow to work.
+Must be `SimpleOpportunity` for the Revenue Cloud Advanced Quote flow to work. This is enforced upstream by the OmniScript (see above) — don't try to change it after Quote creation, `Quote.OpportunityId` is not updateable.
 
 ## Metadata deploy workaround
 

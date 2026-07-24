@@ -4,8 +4,8 @@
 **Date:** Thursday, 2026-07-09
 **Time:** 8:00 AM – 2:00 PM Colombia time (COT, UTC-5)
 **Format:** Teams (virtual)
-**Presenter:** Luis Fabián Rodríguez (SE)
-**Technical backup:** Nehuen Lihue Lobo (Slack)
+**Presenter:** the presenting SE
+**Technical backup:** (reach via team Slack)
 **Demo org:** `ins-qbranch-alfa` — https://storm-c90aab66569c63.my.salesforce.com
 
 ---
@@ -198,7 +198,7 @@ If the client asks "why is the reserve (50MM) larger than the estimate (48MM)?" 
 
 *(sample script — deliver in the client's language)*
 
-> "Good morning Seguros ALFA team. I'm Luis Fabián Rodríguez, Solution Engineer at Salesforce. I'll be with you today for this technical presentation of the RFP, where we'll show you real functional evidence running on a Salesforce Insurance on Core org configured specifically for the SMB case you described. You won't see slides with screenshots — you'll see the product working live, with data, with flows, with business logic executing."
+> "Good morning Seguros ALFA team. I'm the presenting SE, Solution Engineer at Salesforce. I'll be with you today for this technical presentation of the RFP, where we'll show you real functional evidence running on a Salesforce Insurance on Core org configured specifically for the SMB case you described. You won't see slides with screenshots — you'll see the product working live, with data, with flows, with business logic executing."
 
 ### 4.2 Locale clarification (important to do early)
 
@@ -230,7 +230,7 @@ If the client asks "why is the reserve (50MM) larger than the estimate (48MM)?" 
 
 ## 5. Runbook index
 
-The 4 runbooks are the literal step-by-step guide to executing each block. Luis Fabián: read them in full before Thursday.
+The 4 runbooks are the literal step-by-step guide to executing each block. the presenting SE: read them in full before Thursday.
 
 | File | Block | Duration | 1-liner |
 |------|-------|----------|---------|
@@ -239,7 +239,7 @@ The 4 runbooks are the literal step-by-step guide to executing each block. Luis 
 | `RUNBOOK_BLOCK3_CLAIMS.md` | Block 3 — Claim | 45 min | How to show SIN-PYME-2026-0001 with 3 participants, 3 items, 1 ClaimCoverage with 50MM reserves, 2 payment details (32MM Paid + 8MM Pending Authority), and ClaimPaymentSummary in Pending Payment. |
 | `RUNBOOK_BLOCK6_REPORTING.md` | Block 6 — Reporting | 30 min | How to show the 3 dashboards (Producción / Renovaciones / Siniestralidad Pyme 2026) and the 11 reports in the "Seguros ALFA Pyme" folder; which report closes the claims narrative connecting to Block 3. |
 
-The runbooks live alongside this file in Nehuen's Grupo Aval Insurance project. Coordinate with him via Slack if you can't find them.
+The runbooks live alongside this file in the technical backup's Grupo Aval Insurance project. Coordinate with him via Slack if you can't find them.
 
 ---
 
@@ -256,7 +256,7 @@ The runbooks live alongside this file in Nehuen's Grupo Aval Insurance project. 
 **Anticipated frequent questions and model answers:**
 
 **"How would Reinsurance work in Salesforce?"**
-> "Salesforce Insurance on Core has the complete data model for Reinsurance: cession contracts, proportional and non-proportional treaties, retrocession, shared claims. In this presentation org it's not populated with data, but we can schedule a specific technical session next week where we show you the model activated in another org. Nehuen is the point of contact to coordinate that."
+> "Salesforce Insurance on Core has the complete data model for Reinsurance: cession contracts, proportional and non-proportional treaties, retrocession, shared claims. In this presentation org it's not populated with data, but we can schedule a specific technical session next week where we show you the model activated in another org. the technical backup is the point of contact to coordinate that."
 
 **"How does billing and collections integrate?"**
 > "There are two paths: Salesforce Revenue Cloud (new, unified billing + subscriptions) which integrates natively with Insurance on Core, or integration with your current financial core (SAP, Oracle) via MuleSoft. Either route is supported. The choice depends on the core modernization roadmap you have defined — a topic for an architecture conversation with our Solutions team."
@@ -294,7 +294,7 @@ The runbooks live alongside this file in Nehuen's Grupo Aval Insurance project. 
 1. Refresh (Cmd+R). If it takes >10 sec, don't wait.
 2. "Let's lean on a screenshot for a moment while the platform responds" — pull a screenshot from the `~/demo-alfa/` folder.
 3. Continue the narrative while it recovers.
-4. If it's still down after 3 min: discreet Slack message to Nehuen and change block order (start with Block 6 dashboards which are cached).
+4. If it's still down after 3 min: discreet Slack message to the technical backup and change block order (start with Block 6 dashboards which are cached).
 
 ### 7.2 If the client asks a question you can't answer
 
@@ -305,7 +305,7 @@ The runbooks live alongside this file in Nehuen's Grupo Aval Insurance project. 
 ### 7.3 If the client insists on a block not covered (Reinsurance / Billing)
 
 - Don't improvise a live demo. The org doesn't have that data.
-- "I'd rather show it to you properly in a dedicated session next week than improvise here. Nehuen will coordinate the date."
+- "I'd rather show it to you properly in a dedicated session next week than improvise here. the technical backup will coordinate the date."
 
 ### 7.4 If time is running short
 
@@ -319,17 +319,17 @@ The runbooks live alongside this file in Nehuen's Grupo Aval Insurance project. 
 
 ## 8. Emergency contact
 
-**Nehuen Lihue Lobo** — direct Slack DM throughout the demo.
+**the technical backup** — direct Slack DM throughout the demo.
 
-Nehuen has admin access to the org and can:
+the technical backup has admin access to the org and can:
 - Execute SOQL live if data appears wrong.
 - Regenerate records if something got corrupted.
 - Confirm IDs, values, fields if in doubt.
-- Respond via chat while Luis Fabián keeps talking live.
+- Respond via chat while the presenting SE keeps talking live.
 
-**Rule:** during the demo, if something looks off, don't correct it in front of the client. Continue, and message Nehuen via Slack. He resolves in the background.
+**Rule:** during the demo, if something looks off, don't correct it in front of the client. Continue, and message the technical backup via Slack. He resolves in the background.
 
-**Reminder:** Laura is on PTO. Don't contact her unless it's absolutely critical and Nehuen doesn't respond within 5 min.
+**Reminder:** the industry SE is on PTO. Don't contact her unless it's absolutely critical and the technical backup doesn't respond within 5 min.
 
 ---
 
@@ -348,7 +348,7 @@ Nehuen has admin access to the org and can:
 - Send pending questions with official answers.
 - Confirm next meeting.
 
-### 9.3 Internal post-mortem with Nehuen (Friday or Monday)
+### 9.3 Internal post-mortem with the technical backup (Friday or Monday)
 
 - What worked, what failed, what to improve for future presentations.
 - Update the runbooks with lessons learned.
@@ -363,7 +363,7 @@ Nehuen has admin access to the org and can:
 - [ ] Quick review of the 4 runbooks (20 min, skim, don't read in full).
 - [ ] All 16 tabs open and verified.
 - [ ] Backup screenshots accessible.
-- [ ] Nehuen confirmed on Slack as available.
+- [ ] the technical backup confirmed on Slack as available.
 - [ ] Teams open with the meeting room ready.
 - [ ] Camera and microphone tested.
 - [ ] Screen sharing configured.
@@ -371,5 +371,5 @@ Nehuen has admin access to the org and can:
 
 ---
 
-**Last updated:** 2026-07-07 (Nehuen Lobo).
-**Next review:** Wednesday night, 2026-07-08 with Luis Fabián.
+**Last updated:** 2026-07-07 .
+**Next review:** Wednesday night, 2026-07-08 with the presenting SE.

@@ -1,6 +1,6 @@
 # Runbook — Block 1: Modular, Plan-Based SMB Product Configuration
 
-**Assigned duration**: 48 min *(catalog + configurator + Issue Policy + pricing + rules + publication, all live)* | **Presenter**: Luis Fabián | **Org**: ins-qbranch-alfa
+**Assigned duration**: 48 min *(catalog + configurator + Issue Policy + pricing + rules + publication, all live)* | **Presenter**: the presenting SE | **Org**: ins-qbranch-alfa
 **Presentation date**: Thursday, 2026-07-09, 8:00 AM – 2:00 PM Colombia time (Teams)
 **Block slot**: 8:00 – 8:48 (first block, opening of the demo). We tightened ~18 min from the closing open Q&A to make room for live quoting + rate configuration + underwriting rules + product publication.
 
@@ -308,6 +308,18 @@ In this first block we'll demonstrate how Insurance on Core, via the Product Cat
 ### Step 2.8 — Quote from Panadería La Espiga: Create Quote OmniScript (2 min)
 
 **Objective:** step out of the static catalog and show the moment the agent builds a quote for a real customer. This is the catalog's "runtime" — where the product definition we just reviewed becomes a configured Quote.
+
+> ⚠️ **Do NOT create the Quote manually from the Quotes tab.** The Product Configurator LWC will crash with `Cannot read properties null (reading 'groups')` because a hand-created Quote is missing three pieces the LWC checks at load time:
+>
+> 1. **`Quote.TransactionType`** must be `AutoTransactionType` (or `GroupInsuranceTransactionType`) — the field looks optional in the UI but the LWC requires it.
+> 2. **The linked Opportunity's RecordType** must be `SimpleOpportunity` — no other RT has the required pricebook/configurator bindings for this flow.
+> 3. **The Opportunity's `Pricebook2Id`** must be the Standard Pricebook, resolved dynamically.
+>
+> The **OmniScript `Create Quote B2C Insurance 2`** encapsulates all three: it creates the Opportunity with the right RT, links the Quote, and sets `TransactionType`. That's why the demo flow starts from the Account's Action Launcher — never from the Quotes tab directly.
+>
+> In real life, the same OmniScript would first look up an existing Opportunity for the customer (or create one from a broker referral) and then create the linked Quote with the correct fields. In this demo we simplified it to "one click and both records are ready", but the underlying pattern is: **Opportunity first (with SimpleOpportunity RT + Standard Pricebook) → Quote linked to it (with TransactionType populated) → then Browse Catalogs**. Any deviation from this order breaks the LWC.
+>
+> Full technical detail: [`CLAUDE.md`](CLAUDE.md) sections "RCA Quote requires TransactionType" and "Opportunity RecordType for RCA".
 
 **Click / navigation:**
 

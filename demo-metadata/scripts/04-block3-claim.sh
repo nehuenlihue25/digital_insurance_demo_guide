@@ -46,9 +46,13 @@ ACCOUNT_PANADERIA_ID=$(query_id "SELECT Id FROM Account WHERE Name = 'Panaderia 
 [ -z "${ACCOUNT_PANADERIA_ID}" ] && { echo "ERROR: Panadería Account not found"; exit 1; }
 echo "    Panadería Account:      ${ACCOUNT_PANADERIA_ID}"
 
-OWNER_NEHUEN_ID=$(query_id "SELECT Id FROM User WHERE Name LIKE 'Nehuen%' AND IsActive = true LIMIT 1")
-[ -z "${OWNER_NEHUEN_ID}" ] && { echo "ERROR: User Nehuen not found"; exit 1; }
-echo "    Owner Nehuen:           ${OWNER_NEHUEN_ID}"
+# Resolve the Claim owner as the currently-authenticated user (the one running
+# this script). Portable across orgs — never hardcoded to a specific name.
+CURRENT_USERNAME=$(SF_TEMP_SHOW_SECRETS=true ${SF} org display --target-org "${TARGET_ORG}" --json 2>/dev/null \
+  | /usr/bin/python3 -c 'import sys,json,re;raw=sys.stdin.read();clean=re.sub(r"\x1b\[[0-9;]*[a-zA-Z]","",raw);print(json.loads(clean)["result"]["username"])')
+CLAIM_OWNER_ID=$(query_id "SELECT Id FROM User WHERE Username = '${CURRENT_USERNAME}' AND IsActive = true LIMIT 1")
+[ -z "${CLAIM_OWNER_ID}" ] && { echo "ERROR: current user (${CURRENT_USERNAME}) not found in org"; exit 1; }
+echo "    Claim owner (current user): ${CLAIM_OWNER_ID}"
 
 POLICY_ID=$(query_id "SELECT Id FROM InsurancePolicy WHERE Name = 'POL-PYME-2026-0001' LIMIT 1")
 [ -z "${POLICY_ID}" ] && { echo "ERROR: Policy POL-PYME-2026-0001 not found"; exit 1; }
@@ -81,7 +85,7 @@ if [ -z "${CLAIM_ID}" ]; then
     Name='${CLAIM_NAME}' \
     PolicyNumberId='${POLICY_ID}' \
     AccountId='${ACCOUNT_PANADERIA_ID}' \
-    OwnerId='${OWNER_NEHUEN_ID}' \
+    OwnerId='${CLAIM_OWNER_ID}' \
     ClaimType='Fire/Smoke Damage' \
     Status='Coverage Confirmed' \
     Severity='High' \

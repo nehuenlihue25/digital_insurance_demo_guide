@@ -1,6 +1,6 @@
 # Runbook — Block 6: Reporting
 
-**Duration**: 30 min | **Presenter**: Luis Fabián | **Org**: ins-qbranch-alfa
+**Duration**: 30 min | **Presenter**: the presenting SE | **Org**: ins-qbranch-alfa
 **Instance URL**: https://storm-c90aab66569c63.my.salesforce.com
 
 > *All quoted talk tracks below are sample scripts — Spanish speakers should deliver them in the client's language.*
@@ -321,7 +321,7 @@ We close with the claims experience dashboard because visually it's the most imp
 **What to say:**
 > "With that we close the four blocks that were agreed for today: product and coverage configuration — with Block 5 on Clauses integrated inside the issuance cycle — policy lifecycle, claims, and reporting. All on the same platform, no additional integrations, with transactional and analytical data on the same engine. We're happy to take questions."
 
-**Internal note for the SE**: the original scope defined 5 blocks (1. Product, 2. Policy, 3. Claims, 5. Clauses, 6. Reporting) but **Block 5 was explicitly integrated into the Block 2 issuance flow**. That's why today we have 4 effective runbooks, not 5. Blocks 4 (Billing and Collections) and the original Reinsurance are **out of scope** per the decision with GFT/Mario.
+**Internal note for the SE**: the original scope defined 5 blocks (1. Product, 2. Policy, 3. Claims, 5. Clauses, 6. Reporting) but **Block 5 was explicitly integrated into the Block 2 issuance flow**. That's why today we have 4 effective runbooks, not 5. Blocks 4 (Billing and Collections) and the original Reinsurance are **out of scope** per the decision with GFT/management.
 
 ---
 
@@ -406,7 +406,7 @@ At the end of the block, the client should have clear:
 - [ ] The platform **scales into CRM Analytics** for advanced analytics and into external tools (Tableau/Power BI) via API when needed.
 - [ ] The package of **11 reports + 3 dashboards** was built in hours, not weeks — a clear time-to-value signal.
 
-### Closing checklist for Luis Fabián
+### Closing checklist for the presenting SE
 - [ ] Leave the last screen on the **Siniestralidad Dashboard** (tab 5) — it's the final image projected during Q&A.
 - [ ] Verbally confirm that the **4 effective scope blocks were delivered** (Block 1 Product, Block 2 Policy with Block 5 Clauses integrated, Block 3 Claims, Block 6 Reporting).
 - [ ] Remind the client that **Reinsurance and Billing/Collections are out of today's scope** — don't let the impression form that they were forgotten.

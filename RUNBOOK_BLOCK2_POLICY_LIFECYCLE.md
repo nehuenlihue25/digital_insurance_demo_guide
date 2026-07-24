@@ -1,6 +1,6 @@
 # Runbook — Block 2: Full policy lifecycle
 
-**Duration**: 45 min | **Presenter**: Luis Fabián Rodríguez | **Org**: ins-qbranch-alfa (https://storm-c90aab66569c63.my.salesforce.com)
+**Duration**: 45 min | **Presenter**: the presenting SE | **Org**: ins-qbranch-alfa (https://storm-c90aab66569c63.my.salesforce.com)
 
 > *All talk tracks below are sample scripts written in English for reference. Deliver them in the client's language (Spanish) on the day of the presentation.*
 
@@ -10,7 +10,7 @@
 
 ### 0.1 Login and session verification
 1. Open Chrome (regular profile, NOT incognito — we need a persisted session and want to avoid re-login).
-2. Go to `https://storm-c90aab66569c63.my.salesforce.com` and confirm you are already logged in as the demo user. If it prompts for login, authenticate with the credentials Nicolás shared over Slack.
+2. Go to `https://storm-c90aab66569c63.my.salesforce.com` and confirm you are already logged in as the demo user. If it prompts for login, authenticate with the credentials the technical lead shared over Slack.
 3. In the top Salesforce bar, upper-left corner, verify that the App Launcher (9 dots) is visible and that the active app is **Insurance Agent Console**. If it isn't: click App Launcher → type "Insurance Agent Console" → click.
 
 ### 0.2 Critical coverage mapping check (2 min, must do)
@@ -29,7 +29,7 @@
 **Steps**:
 1. Open in a temporary tab `https://storm-c90aab66569c63.my.salesforce.com/lightning/r/InsurancePolicyCoverage/0cYg80000000KErEAM/view` and confirm the Name is **Incendio y Aliados** and Premium = **800,000**.
 2. Open `https://storm-c90aab66569c63.my.salesforce.com/lightning/r/InsurancePolicyCoverage/0cYg80000000KGTEA2/view` and confirm the Name is **Equipo Electrónico** and Premium = **300,000**.
-3. If either of the two does NOT match the expected name: **notify Nicolás over Slack immediately** — the Block 3 runbook points to a specific coverage for the claim and we need to align before kickoff. The convention assumed in this runbook and in the transition to Block 3 is the one in the table above.
+3. If either of the two does NOT match the expected name: **notify the technical lead over Slack immediately** — the Block 3 runbook points to a specific coverage for the claim and we need to align before kickoff. The convention assumed in this runbook and in the transition to Block 3 is the one in the table above.
 
 ### 0.3 Browser tabs (open in this order, leave them all loaded)
 
@@ -363,7 +363,7 @@ This block demonstrates the **full lifecycle of a Pyme policy** already issued o
 
 ## 5. Architecture and extensions — beyond the native lifecycle
 
-*This section is designed to answer the questions Luis Fabián flagged that go beyond what Digital Insurance covers out of the box: recurring collection by payment method, per-sponsor scheduling parameters, retry logic, payment method updates, integration surface, mass file ingest, and bank file generation. Deliver these transparently — the platform doesn't ship all of them as OOTB features on Digital Insurance itself, but each has a clear, supported extension path.*
+*This section is designed to answer the questions the presenting SE flagged that go beyond what Digital Insurance covers out of the box: recurring collection by payment method, per-sponsor scheduling parameters, retry logic, payment method updates, integration surface, mass file ingest, and bank file generation. Deliver these transparently — the platform doesn't ship all of them as OOTB features on Digital Insurance itself, but each has a clear, supported extension path.*
 
 ### 5.1 Native vs. extension map (share this table if the client asks)
 

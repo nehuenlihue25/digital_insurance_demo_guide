@@ -88,4 +88,4 @@ See the full `learnings/`, but the 5 most critical:
 
 ## Contact
 
-Runbooks + this metadata are artifacts of Nehuen Lobo's (@nlobo) demo for the Seguros ALFA — Grupo Aval project.
+Runbooks + this metadata are artifacts of the technical backup's  demo for the Seguros ALFA — Grupo Aval project.
