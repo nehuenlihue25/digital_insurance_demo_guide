@@ -20,6 +20,20 @@
 
 Set these up **once per machine**, not per demo. Skip any bullet you already have.
 
+### 0.0 Get the repo
+
+```bash
+# Prerequisite: git installed (verify with `git --version` — 2.x+ expected)
+git clone https://github.com/nehuenlihue25/digital_insurance_demo_guide.git
+cd digital_insurance_demo_guide
+```
+
+Every command in the phases below assumes your terminal's `pwd` is inside this cloned directory. When the runbooks or scripts say "the repo root", they mean this folder.
+
+To pull updates later (`git fetch origin && git merge origin/main`) — the gotchas file and the baseline grow over time as new SEs contribute back.
+
+**Why**: cloning locally (rather than reading on the web) is what unlocks every automation in this repo. The setup scripts, baseline verifier, and OmniStudio MCP helper are all shell scripts you execute from your terminal. Reading the runbooks alone gets you 40% of the value; running the scripts gets you the other 60%.
+
 ### 0.1 The IDO — non-negotiable
 
 You need the `FINS QBranch - INS on Core IDO`. Any other Digital Insurance-flavored org will fail somewhere in the checks below.
