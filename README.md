@@ -4,6 +4,12 @@
 
 This repo is designed to be **forked and adapted**. The concrete demo values (Seguros ALFA as the carrier, Grupo Aval as the parent group, Panadería La Espiga as the SME account) are placeholders — swap them for your own client.
 
+## 🚀 If it's your first time — start here
+
+**Open [`FIRST_TIME_SE_PLAYBOOK.md`](FIRST_TIME_SE_PLAYBOOK.md).** It's a phase-by-phase walkthrough (0 → demo-ready in ~60 min) that explains **why** of every step, not just the what. Includes baseline verification, Claude Code + MCP setup, when to prompt Claude for help, and what to do at each failure point. Written after real feedback from a colleague who couldn't complete the demo solo on the first attempt — the playbook fills exactly the gaps she hit.
+
+The rest of this README is the technical reference behind that playbook.
+
 ## ⚠️ Required org — read this FIRST
 
 **Deploy this demo on the IDO `FINS QBranch - INS on Core IDO`.** Do not use any other org — the whole guide assumes this IDO because it is the only one that ships with the full stack pre-provisioned (Digital Insurance + Revenue Cloud Advanced + Product Configurator + Advanced Configurator Designer + OmniStudio + Context Service + Salesforce Pricing + all the Permission Set Licenses). Any other Digital Insurance org will send you into hours of hunting down license and permission gaps before the scripts even start working.
@@ -94,9 +100,10 @@ If all three commands succeed, you're ready for the **Quick start** below.
 
 ### Automation and knowledge (`demo-metadata/`)
 
-- `scripts/` — 6 shell scripts that recreate the entire demo dataset in any Digital Insurance org in ~5–10 minutes
+- `scripts/` — 8 shell scripts covering baseline verification, the full data build in ~5–10 minutes, MDAPI deploy, and MCP setup
 - `metadata/` — MDAPI packages ready to deploy (5 Custom Report Types + 3 dashboards + 11 reports)
-- `learnings/` — 13 technical gotchas, 10 sf CLI quirks in sandbox, RCA/RLM setup guide, 10 talk tracks for uncomfortable questions, 10 meta-lessons for the next Claude Code session
+- `baseline/` — reference snapshot of what a working IDO looks like: 36 required PSLs, 7 critical PSs, 5 Record Types, package fingerprint. Use `00b-verify-baseline.sh` to diff your org against this before running anything else.
+- `learnings/` — 14 technical gotchas, 10 sf CLI quirks in sandbox, RCA/RLM setup guide, OmniStudio MCP setup, 10 talk tracks for uncomfortable questions, 10 meta-lessons for the next Claude Code session
 - `reference-ids.md` — snapshot of the current IDs (reference only; scripts must resolve IDs dynamically)
 
 ## Quick start — Replicate the demo in your org
